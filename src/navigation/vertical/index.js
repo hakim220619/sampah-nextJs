@@ -2,8 +2,7 @@ const navigation = () => {
   return [
     {
       title: 'Dashboards',
-      icon: 'mdi:home-outline',
-      badgeColor: 'error'
+      icon: 'mdi:home-outline'
     },
 
     {
@@ -11,11 +10,11 @@ const navigation = () => {
       icon: 'mdi:file-document-outline',
       children: [
         {
-          title: 'List',
-          path: '/apps/invoice/list'
+          title: 'Admin',
+          path: '/admin'
         },
         {
-          title: 'Preview',
+          title: 'User',
           path: '/apps/invoice/preview'
         },
         {
@@ -27,6 +26,10 @@ const navigation = () => {
           path: '/apps/invoice/add'
         }
       ]
+    },
+    {
+      title: 'Post',
+      icon: 'mdi:home-outline'
     }
   ]
 }
