@@ -349,19 +349,19 @@ const AutocompleteComponent = ({ hidden, settings }) => {
   const fullScreenDialog = useMediaQuery(theme.breakpoints.down('sm'))
 
   // Get all data using API
-  useEffect(() => {
-    axios
-      .get('/app-bar/search', {
-        params: { q: searchValue }
-      })
-      .then(response => {
-        if (response.data && response.data.length) {
-          setOptions(response.data)
-        } else {
-          setOptions([])
-        }
-      })
-  }, [searchValue])
+  // useEffect(() => {
+  //   axios
+  //     .get('/app-bar/search', {
+  //       params: { q: searchValue }
+  //     })
+  //     .then(response => {
+  //       if (response.data && response.data.length) {
+  //         setOptions(response.data)
+  //       } else {
+  //         setOptions([])
+  //       }
+  //     })
+  // }, [searchValue])
   useEffect(() => {
     if (!openDialog) {
       setSearchValue('')

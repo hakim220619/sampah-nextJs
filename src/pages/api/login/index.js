@@ -1,13 +1,41 @@
 import excuteQuery from 'src/configs/db'
+import jwt from 'jsonwebtoken'
 
+const jwtConfig = {
+  secret: process.env.NEXT_PUBLIC_JWT_SECRET,
+  expirationTime: process.env.NEXT_PUBLIC_JWT_EXPIRATION,
+  refreshTokenSecret: process.env.NEXT_PUBLIC_JWT_REFRESH_TOKEN_SECRET
+}
 export default async (req, res) => {
   try {
-    console.log(req.body.data.email)
+    var today = new Date(),
+      date =
+        today.getFullYear() +
+        '-' +
+        today.getMonth() +
+        1 +
+        '-' +
+        today.getDate() +
+        ' ' +
+        today.getHours() +
+        ':' +
+        today.getMinutes() +
+        ':' +
+        today.getSeconds()
+    // console.log(req.body)
+
     const result = await excuteQuery({
       query: 'select * from users where email = ?',
-      values: [req.body.data.email]
+      values: [req.body.email]
     })
-    res.status(200).json({ data: result[0] })
+    // console.log(result)
+    const accessToken = jwt.sign({ id: result[0]['id'] }, jwtConfig.secret, { expiresIn: jwtConfig.expirationTime })
+    await excuteQuery({
+      query:
+        'INSERT INTO personal_access_tokens (tokenable_type , tokenable_id , name, token, abilities, last_used_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      values: ['Auth/Login', result[0]['id'], 'AuthToken', accessToken, '["*"]', date, date]
+    })
+    res.status(200).json({ userData: result[0], accessToken: accessToken })
   } catch (error) {
     console.log(error)
   }

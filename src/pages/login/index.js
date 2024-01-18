@@ -107,7 +107,7 @@ const schema = yup.object().shape({
 
 const defaultValues = {
   password: 'admin',
-  email: 'danilukman@gmail.com'
+  email: 'danilukman2206@gmail.com'
 }
 
 const defaultProvider = {
@@ -122,45 +122,6 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [user, setUser] = useState(defaultProvider.user)
   const [loading, setLoading] = useState(defaultProvider.loading)
-
-  const jwtConfig = {
-    secret: process.env.NEXT_PUBLIC_JWT_SECRET,
-    expirationTime: process.env.NEXT_PUBLIC_JWT_EXPIRATION,
-    refreshTokenSecret: process.env.NEXT_PUBLIC_JWT_REFRESH_TOKEN_SECRET
-  }
-
-  useEffect(() => {
-    const initAuth = async () => {
-      const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-      if (storedToken) {
-        setLoading(true)
-        await axios
-          .get(authConfig.meEndpoint, {
-            headers: {
-              Authorization: storedToken
-            }
-          })
-          .then(async response => {
-            setLoading(false)
-            setUser({ ...response.data.userData })
-          })
-          .catch(() => {
-            localStorage.removeItem('userData')
-            localStorage.removeItem('refreshToken')
-            localStorage.removeItem('accessToken')
-            setUser(null)
-            setLoading(false)
-            if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
-              router.replace('/login')
-            }
-          })
-      } else {
-        setLoading(false)
-      }
-    }
-    initAuth()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // ** Hooks
   const auth = useAuth()
@@ -185,54 +146,12 @@ const LoginPage = () => {
 
   const onSubmit = async data => {
     const { email, password } = data
-    const auth = await fetch('http://localhost:3000/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        data: {
-          email: email,
-          password: password
-        }
+    auth.login({ email, password, rememberMe }, () => {
+      setError('email', {
+        type: 'manual',
+        message: 'Email or Password is invalid'
       })
     })
-      .then(response => {
-        const dataAuth = response.json()
-        console.log(dataAuth['value'])
-        const accessToken = jwt.sign({ id: 1 }, jwtConfig.secret, { expiresIn: jwtConfig.expirationTime })
-
-        const resp = {
-          accessToken,
-          userData: { ...user, password: undefined }
-        }
-
-        data.rememberMe ? window.localStorage.setItem(authConfig.storageTokenKeyName, resp.data.accessToken) : null
-        const returnUrl = router.query.returnUrl
-        setUser({ dataAuth })
-        data.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.userData)) : null
-        const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-        router.replace(redirectURL)
-      })
-      .then(data => console.log(data))
-
-    console.log(auth)
-
-    // axios
-    // .post('http://localhost:3000/api/login', params)
-    // .then(async response => {
-    //   params.rememberMe
-    //     ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
-    //     : null
-    //   const returnUrl = router.query.returnUrl
-    //   setUser({ ...response.data.userData })
-    //   params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.userData)) : null
-    //   const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-    //   router.replace(redirectURL)
-    // })
-    // .catch(err => {
-    //   if (errorCallback) errorCallback(err)
-    // })
   }
   const imageSource = skin === 'bordered' ? 'auth-v2-login-illustration-bordered' : 'auth-v2-login-illustration'
 

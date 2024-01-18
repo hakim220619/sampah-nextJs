@@ -2,24 +2,7 @@ const navigation = () => {
   return [
     {
       icon: 'mdi:home-outline',
-      title: 'Dashboards',
-      children: [
-        {
-          icon: 'mdi:chart-donut',
-          title: 'CRM',
-          path: '/dashboards/crm'
-        },
-        {
-          icon: 'mdi:chart-timeline-variant',
-          title: 'Analytics',
-          path: '/dashboards/analytics'
-        },
-        {
-          icon: 'mdi:cart-outline',
-          title: 'eCommerce',
-          path: '/dashboards/ecommerce'
-        }
-      ]
+      title: 'Dashboards'
     },
     {
       icon: 'mdi:apps',
@@ -128,7 +111,6 @@ const navigation = () => {
           icon: 'mdi:google-circles-extended'
         },
         {
-          
           title: 'Cards',
           icon: 'mdi:credit-card-outline',
           children: [
@@ -241,7 +223,7 @@ const navigation = () => {
             {
               title: 'More',
               path: '/components/more'
-            },
+            }
           ]
         }
       ]
@@ -534,7 +516,7 @@ const navigation = () => {
             {
               title: 'Input Mask',
               path: '/forms/form-elements/input-mask'
-            },
+            }
           ]
         },
         {

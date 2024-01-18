@@ -31,15 +31,16 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+      // console.log(storedToken)
+
       if (storedToken) {
         setLoading(true)
         await axios
-          .get(authConfig.meEndpoint, {
-            headers: {
-              Authorization: storedToken
-            }
+          .post(authConfig.meEndpoint, {
+            token: storedToken
           })
           .then(async response => {
+            console.log(response.data.userData)
             setLoading(false)
             setUser({ ...response.data.userData })
           })
@@ -62,13 +63,16 @@ const AuthProvider = ({ children }) => {
   }, [])
 
   const handleLogin = (params, errorCallback) => {
+    // console.log(params)
     axios
-      .post(authConfig.loginEndpoint, params)
+      .post('http://localhost:3000/api/login', params)
       .then(async response => {
+        // console.log(response.data)
         params.rememberMe
           ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
           : null
         const returnUrl = router.query.returnUrl
+        // console.log(response.data.userData)
         setUser({ ...response.data.userData })
         params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.userData)) : null
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
