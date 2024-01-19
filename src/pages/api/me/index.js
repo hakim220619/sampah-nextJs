@@ -7,6 +7,7 @@ const jwtConfig = {
   refreshTokenSecret: process.env.NEXT_PUBLIC_JWT_REFRESH_TOKEN_SECRET
 }
 export default async (req, res) => {
+  
   try {
     // console.log(req.body.token)
     const result = await excuteQuery({
