@@ -62,7 +62,7 @@ const schema = yup.object().shape({
     .required(),
   password: yup
     .string()
-    .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
+    .min(3, obj => showErrors('Password', obj.value.length, obj.min))
     .required()
 })
 
@@ -81,7 +81,7 @@ const SidebarAddUser = props => {
 
   // ** State
   const [role, setRole] = useState('admin')
-  console.log(role)
+  // console.log(role)
   // ** Hooks
   const dispatch = useDispatch()
   const store = useSelector(state => state.user)
@@ -101,16 +101,26 @@ const SidebarAddUser = props => {
   // console.log(defaultValues)
   const onSubmit = async data => {
     const dataAll = JSON.stringify({ data, role })
-    console.log(dataAll)
+    // console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json'
       }
     }
-    const result = await axios.post('/api/users', dataAll, customConfig)
-    console.log(result)
-    toggle()
-    reset()
+    // const result = await axios.post('/api/users', dataAll, customConfig)
+    // console.log(result)
+    await axios
+      .post('http://localhost:3000/api/users', dataAll, customConfig)
+      .then(async response => {
+        console.log(response)
+        reset()
+        toggle()
+      })
+      .catch(() => {
+        console.log('gagal')
+      })
+    // toggle()
+
     // if (store.allData.some(u => u.email === data.email || u.phone === data.phone)) {
     //   store.allData.forEach(u => {
     //     if (u.email === data.email) {

@@ -1,21 +1,9 @@
 import excuteQuery from 'src/configs/db'
 import bcrypt from 'bcryptjs'
+
 export default async (req, res) => {
   try {
-    var today = new Date(),
-      date =
-        today.getFullYear() +
-        '-' +
-        today.getMonth() +
-        1 +
-        '-' +
-        today.getDate() +
-        ' ' +
-        today.getHours() +
-        ':' +
-        today.getMinutes() +
-        ':' +
-        today.getSeconds()
+    // console.log(req)
     switch (req.method) {
       case 'GET':
         /// const storedToken = req.headers.authorization
@@ -32,13 +20,25 @@ export default async (req, res) => {
         break
 
       case 'POST':
-        const hashedPassword = await bcrypt.hash(req.body.data.password, 60)
-
-        console.log(hashedPassword)
-        console.log(req.body.data.password)
-        await excuteQuery({
+        var today = new Date(),
+          date =
+            today.getFullYear() +
+            '-' +
+            today.getMonth() +
+            1 +
+            '-' +
+            today.getDate() +
+            ' ' +
+            today.getHours() +
+            ':' +
+            today.getMinutes() +
+            ':' +
+            today.getSeconds()
+        console.log(date)
+        const hashedPassword = await bcrypt.hash(req.body.data.password, 10)
+        const response = await excuteQuery({
           query:
-            'INSERT INTO users (fullName , email , phone, address, role, password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?) ',
+            'INSERT INTO users (fullName , email , phone, address, role, password, state, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
           values: [
             req.body.data.fullName,
             req.body.data.email,
@@ -46,10 +46,11 @@ export default async (req, res) => {
             req.body.data.address,
             req.body.role,
             hashedPassword,
+            'ON',
             date
           ]
         })
-        // console.log(req.body.role)
+        console.log(response)
         res.status(201).json({ status: 'Successs Insert Users' })
         break
 

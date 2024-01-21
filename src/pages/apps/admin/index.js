@@ -226,23 +226,12 @@ const UserList = ({ apiData }) => {
         currentPlan: plan
       })
     )
-  }, [dispatch, plan, role, status, value])
-  console.log(store)
+  }, [dispatch, plan, role, state, value])
+  // console.log(store)
   const handleFilter = useCallback(val => {
     setValue(val)
   }, [])
 
-  const handleRoleChange = useCallback(e => {
-    setRole(e.target.value)
-  }, [])
-
-  const handlePlanChange = useCallback(e => {
-    setPlan(e.target.value)
-  }, [])
-
-  const handleStatusChange = useCallback(e => {
-    setStatus(e.target.value)
-  }, [])
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
 
   return (
