@@ -2,7 +2,8 @@ const navigation = () => {
   return [
     {
       title: 'Dashboards',
-      icon: 'mdi:home-outline'
+      icon: 'mdi:home-outline',
+      path: '/'
     },
 
     {
@@ -11,7 +12,7 @@ const navigation = () => {
       children: [
         {
           title: 'Admin',
-          path: '/admin'
+          path: '/apps/admin'
         },
         {
           title: 'User',

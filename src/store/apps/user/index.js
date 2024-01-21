@@ -5,7 +5,7 @@ import axios from 'axios'
 
 // ** Fetch Users
 export const fetchData = createAsyncThunk('appUsers/fetchData', async params => {
-  const response = await axios.get('/apps/users/list', {
+  const response = await axios.get('http://localhost:3000/api/users', {
     params
   })
 

@@ -45,8 +45,19 @@ export default async (req, res) => {
               'INSERT INTO personal_access_tokens (tokenable_type , tokenable_id , name, token, abilities, last_used_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?) ',
             values: ['Auth/Login', result[0]['id'], 'AuthToken', accessToken, '["*"]', date, date]
           })
+
           res.status(200).json({ userData: result[0], accessToken: accessToken })
         } else {
+          const asd = await excuteQuery({
+            query:
+              'UPDATE personal_access_tokens SET token = "' +
+              accessToken +
+              '", updated_at = "' +
+              date +
+              '" WHERE tokenable_id = "' +
+              result[0]['id'] +
+              '"; '
+          })
           res.status(200).json({ userData: result[0], accessToken: accessToken })
         }
       } else {
