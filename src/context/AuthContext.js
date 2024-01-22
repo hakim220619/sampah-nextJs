@@ -31,7 +31,9 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-      // console.log(storedToken)
+      const userData = window.localStorage.getItem('userData')
+      const refreshToken = window.localStorage.getItem('refreshToken')
+      console.log(storedToken)
       // localStorage.removeItem('userData')
       // localStorage.removeItem('refreshToken')
       // localStorage.removeItem('accessToken')

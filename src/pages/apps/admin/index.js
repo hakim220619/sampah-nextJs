@@ -44,6 +44,7 @@ import axios from 'axios'
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
 import AddUserDrawer from 'src/pages/apps/admin/AddUserDrawer'
+import EditUserDialog from 'src/pages/apps/admin/EditUserDialog'
 
 // ** Vars
 const userRoleObj = {
@@ -216,20 +217,18 @@ const UserList = ({ apiData }) => {
   // console.log(apiData)
   // ** Hooks
   const dispatch = useDispatch()
-  const store = useSelector(state => apiData.data)
+  const store = useSelector(state => state.user)
   useEffect(() => {
     dispatch(
       fetchData({
-        role,
-        state,
-        q: value,
-        currentPlan: plan
+        q: value
       })
     )
-  }, [dispatch, plan, role, state, value])
+  }, [dispatch, value])
   // console.log(store)
   const handleFilter = useCallback(val => {
     setValue(val)
+    // console.log(val)
   }, [])
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
@@ -242,7 +241,7 @@ const UserList = ({ apiData }) => {
           <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
           <DataGrid
             autoHeight
-            rows={store}
+            rows={store.data}
             columns={columns}
             checkboxSelection
             disableRowSelectionOnClick
@@ -254,7 +253,7 @@ const UserList = ({ apiData }) => {
         </Card>
       </Grid>
 
-      <AddUserDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
+      <EditUserDialog show={addUserOpen} toggle={toggleAddUserDrawer} />
     </Grid>
   )
 }

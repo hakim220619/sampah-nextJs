@@ -113,6 +113,7 @@ const SidebarAddUser = props => {
       .post('http://localhost:3000/api/users', dataAll, customConfig)
       .then(async response => {
         console.log(response)
+        dispatch(addUser({ ...data, role }))
         reset()
         toggle()
       })

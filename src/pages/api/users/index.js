@@ -6,20 +6,34 @@ export default async (req, res) => {
     // console.log(req)
     switch (req.method) {
       case 'GET':
-        /// const storedToken = req.headers.authorization
-        // // console.log(res)
+        // const storedToken = req.headers.authorization
+        // console.log(storedToken)
         // if (storedToken) {
-        const result = await excuteQuery({
+        const data = await excuteQuery({
           query: 'select * from users'
         })
-        // console.log(result)
-        res.status(200).json({ data: result, rows: 10 })
+
+        const { q = '' } = req.query ?? ''
+        const queryLowered = q.toLowerCase()
+        // console.log(data)
+        const filteredData = data.filter(
+          data =>
+            data.email.toLowerCase().includes(queryLowered) ||
+            data.fullName.toLowerCase().includes(queryLowered) ||
+            data.role.toLowerCase().includes(queryLowered)
+        )
+
+        // console.log(filteredData)
+        res
+          .status(200)
+          .json({ allData: data, users: filteredData, params: req.params, total: filteredData.length, rows: 10 })
         // } else {
         //   res.status(200).json({ status: false, message: 'Token Invalide' })
         // }
         break
 
       case 'POST':
+        // console.log(req.body.data)
         var today = new Date(),
           date =
             today.getFullYear() +
@@ -34,7 +48,7 @@ export default async (req, res) => {
             today.getMinutes() +
             ':' +
             today.getSeconds()
-        console.log(date)
+        console.log(req.body)
         const hashedPassword = await bcrypt.hash(req.body.data.password, 10)
         const response = await excuteQuery({
           query:
@@ -50,13 +64,19 @@ export default async (req, res) => {
             date
           ]
         })
-        console.log(response)
+        // console.log(response)
         res.status(201).json({ status: 'Successs Insert Users' })
         break
 
-      case 'PATCH':
+      case 'DELETE':
+        console.log(req.body)
+        const result = await excuteQuery({
+          query: 'DELETE FROM users WHERE id = ?',
+          values: [req.body]
+        })
         //some code...
-        res.status(200).json({ response })
+        console.log(result)
+        res.status(200).json({ status: 'Successs Deleted Users' })
         break
 
       default:
