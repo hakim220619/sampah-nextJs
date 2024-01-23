@@ -57,7 +57,7 @@ const showErrors = (field, valueLen, min) => {
 const DialogEditUserInfo = props => {
   // ** States
   const { show, toggle } = props
-  console.log(props)
+
   const [role, setRole] = useState('admin')
   const dispatch = useDispatch()
   const schema = yup.object().shape({
@@ -151,7 +151,7 @@ const DialogEditUserInfo = props => {
             </IconButton>
             <Box sx={{ mb: 8, textAlign: 'center' }}>
               <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
-                Edit Users
+                Add Users
               </Typography>
             </Box>
 

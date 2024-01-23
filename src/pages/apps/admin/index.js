@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, forwardRef } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -20,6 +20,8 @@ import FormControl from '@mui/material/FormControl'
 import CardContent from '@mui/material/CardContent'
 import { DataGrid } from '@mui/x-data-grid'
 import Select from '@mui/material/Select'
+import Dialog from '@mui/material/Dialog'
+import Button from '@mui/material/Button'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -43,9 +45,14 @@ import axios from 'axios'
 
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
-import AddUserDrawer from 'src/pages/apps/admin/AddUserDrawer'
+import AddUserDialog from 'src/pages/apps/admin/AddUserDialog'
 import EditUserDialog from 'src/pages/apps/admin/EditUserDialog'
-
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import TextField from '@mui/material/TextField'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
+import Fade from '@mui/material/Fade'
 // ** Vars
 const userRoleObj = {
   admin: { icon: 'mdi:laptop', color: 'error.main' },
@@ -56,10 +63,12 @@ const userRoleObj = {
 }
 
 const userStatusObj = {
-  active: 'success',
-  pending: 'warning',
-  inactive: 'secondary'
+  ON: 'primary',
+  OFF: 'warning'
 }
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Fade ref={ref} {...props} />
+})
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   fontWeight: 600,
@@ -72,14 +81,94 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   }
 }))
 
-const RowOptions = ({ id }) => {
+const openModalEdit = params => {
+  // console.log(params)
+  const [show, setShow] = useState(true)
+  return (
+    <Card>
+      <Dialog
+        fullWidth
+        open={show}
+        maxWidth='md'
+        scroll='body'
+        onClose={() => setShow(false)}
+        TransitionComponent={Transition}
+        onBackdropClick={() => setShow(false)}
+      >
+        <DialogContent
+          sx={{
+            position: 'relative',
+            pb: theme => `${theme.spacing(8)} !important`,
+            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+            pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+          }}
+        >
+          <IconButton
+            size='small'
+            onClick={() => setShow(false)}
+            sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
+          >
+            <Icon icon='mdi:close' />
+          </IconButton>
+          <Box sx={{ mb: 8, textAlign: 'center' }}>
+            <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
+              Edit User Information
+            </Typography>
+            <Typography variant='body2'>Updating user details will receive a privacy audit.</Typography>
+          </Box>
+          <Grid container spacing={6}>
+            <Grid item sm={6} xs={12}>
+              <TextField fullWidth defaultValue='Oliver' label='First Name' placeholder='John' />
+            </Grid>
+            <Grid item sm={6} xs={12}>
+              <TextField fullWidth defaultValue='Queen' label='Last Name' placeholder='Doe' />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth defaultValue='oliverQueen' label='Username' placeholder='johnDoe' />
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={<Switch defaultChecked />}
+                label='Make this default shipping address'
+                sx={{
+                  '& .MuiFormControlLabel-label': {
+                    color: 'text.secondary'
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            justifyContent: 'center',
+            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+          }}
+        >
+          <Button variant='contained' sx={{ mr: 2 }} onClick={() => setShow(false)}>
+            Submit
+          </Button>
+          <Button variant='outlined' color='secondary' onClick={() => setShow(false)}>
+            Discard
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Card>
+  )
+}
+
+const RowOptions = ({ id, fullName, email, role, state }) => {
   // ** Hooks
   const dispatch = useDispatch()
-
+  // console.log(fullName)
   // ** State
-  const [anchorEl, setAnchorEl] = useState(null)
-  const rowOptionsOpen = Boolean(anchorEl)
 
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [EditUserOpen, setEditUserOpen] = useState(false)
+  const rowOptionsOpen = Boolean(anchorEl)
+  const toggleEditUserDialog = () => setEditUserOpen(!EditUserOpen)
   const handleRowOptionsClick = event => {
     setAnchorEl(event.currentTarget)
   }
@@ -122,8 +211,8 @@ const RowOptions = ({ id }) => {
           <Icon icon='mdi:eye-outline' fontSize={20} />
           View
         </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
+        <MenuItem onClick={() => openModalEdit(true)} sx={{ '& svg': { mr: 2 } }}>
+          <Icon icon='mdi:pencil-outline' fontSize={20} onClick />
           Edit
         </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
@@ -202,7 +291,9 @@ const columns = [
     sortable: false,
     field: 'actions',
     headerName: 'Actions',
-    renderCell: ({ row }) => <RowOptions id={row.id} />
+    renderCell: ({ row }) => (
+      <RowOptions id={row.id} fullName={row.fullName} email={row.email} role={row.role} state={row.state} />
+    )
   }
 ]
 
@@ -231,14 +322,14 @@ const UserList = ({ apiData }) => {
     // console.log(val)
   }, [])
 
-  const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
+  const toggleAddUserDialog = () => setAddUserOpen(!addUserOpen)
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <Divider />
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
+          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} />
           <DataGrid
             autoHeight
             rows={store.data}
@@ -253,7 +344,7 @@ const UserList = ({ apiData }) => {
         </Card>
       </Grid>
 
-      <EditUserDialog show={addUserOpen} toggle={toggleAddUserDrawer} />
+      <AddUserDialog show={addUserOpen} toggle={toggleAddUserDialog} />
     </Grid>
   )
 }

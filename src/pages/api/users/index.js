@@ -48,7 +48,7 @@ export default async (req, res) => {
             today.getMinutes() +
             ':' +
             today.getSeconds()
-        console.log(req.body)
+        // console.log(req.body)
         const hashedPassword = await bcrypt.hash(req.body.data.password, 10)
         const response = await excuteQuery({
           query:
@@ -64,7 +64,7 @@ export default async (req, res) => {
             date
           ]
         })
-        // console.log(response)
+        console.log(response)
         res.status(201).json({ status: 'Successs Insert Users' })
         break
 
