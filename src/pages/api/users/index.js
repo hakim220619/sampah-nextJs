@@ -33,39 +33,78 @@ export default async (req, res) => {
         break
 
       case 'POST':
-        // console.log(req.body.data)
-        var today = new Date(),
-          date =
-            today.getFullYear() +
-            '-' +
-            today.getMonth() +
-            1 +
-            '-' +
-            today.getDate() +
-            ' ' +
-            today.getHours() +
-            ':' +
-            today.getMinutes() +
-            ':' +
-            today.getSeconds()
-        // console.log(req.body)
-        const hashedPassword = await bcrypt.hash(req.body.data.password, 10)
-        const response = await excuteQuery({
-          query:
-            'INSERT INTO users (fullName , email , phone, address, role, password, state, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
-          values: [
-            req.body.data.fullName,
-            req.body.data.email,
-            req.body.data.phone,
-            req.body.data.address,
-            req.body.role,
-            hashedPassword,
-            'ON',
-            date
-          ]
-        })
-        console.log(response)
-        res.status(201).json({ status: 'Successs Insert Users' })
+        // console.log()
+        if (req.body.data.type == 'edit') {
+          var today = new Date(),
+            date =
+              today.getFullYear() +
+              '-' +
+              today.getMonth() +
+              1 +
+              '-' +
+              today.getDate() +
+              ' ' +
+              today.getHours() +
+              ':' +
+              today.getMinutes() +
+              ':' +
+              today.getSeconds()
+          // console.log(req.body)
+          // const hashedPassword = await bcrypt.hash(req.body.data.passwordEd, 10)
+          const response = await excuteQuery({
+            query:
+              ' UPDATE  users SET fullName = "' +
+              req.body.data.fullNameEd +
+              '" , email = "' +
+              req.body.data.emailEd +
+              '" , phone = "' +
+              req.body.data.phoneEd +
+              '", address = "' +
+              req.body.data.addressEd +
+              '", role = "' +
+              req.body.data.roleEd +
+              '", state = "' +
+              req.body.data.stateEd +
+              '" where id = "' +
+              req.body.data.id +
+              '" '
+          })
+          console.log(response)
+          res.status(201).json({ status: 'Successs Update Users' })
+        } else {
+          var today = new Date(),
+            date =
+              today.getFullYear() +
+              '-' +
+              today.getMonth() +
+              1 +
+              '-' +
+              today.getDate() +
+              ' ' +
+              today.getHours() +
+              ':' +
+              today.getMinutes() +
+              ':' +
+              today.getSeconds()
+          // console.log(req.body)
+          const hashedPassword = await bcrypt.hash(req.body.data.password, 10)
+          const response = await excuteQuery({
+            query:
+              'INSERT INTO users (fullName , email , phone, address, role, password, state, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
+            values: [
+              req.body.data.fullName,
+              req.body.data.email,
+              req.body.data.phone,
+              req.body.data.address,
+              req.body.role,
+              hashedPassword,
+              'ON',
+              date
+            ]
+          })
+          console.log(response)
+          res.status(201).json({ status: 'Successs Insert Users' })
+        }
         break
 
       case 'DELETE':
@@ -77,9 +116,6 @@ export default async (req, res) => {
         //some code...
         console.log(result)
         res.status(200).json({ status: 'Successs Deleted Users' })
-        break
-      case 'PATCH':
-        console.log('asd')
         break
 
       default:

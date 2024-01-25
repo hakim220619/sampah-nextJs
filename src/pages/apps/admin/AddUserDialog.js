@@ -108,7 +108,7 @@ const DialogEditUserInfo = props => {
     await axios
       .post('/api/users', dataAll, customConfig)
       .then(async response => {
-        console.log(response)
+        // console.log(response)
         dispatch(addUser({ ...data, role }))
         reset()
         toggle()

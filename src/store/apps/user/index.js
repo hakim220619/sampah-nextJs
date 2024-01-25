@@ -17,6 +17,9 @@ export const fetchData = createAsyncThunk('appUsers/fetchData', async params => 
 export const addUser = createAsyncThunk('appUsers/addUser', async (data, { getState, dispatch }) => {
   return dispatch(fetchData(getState().user.params))
 })
+export const editUser = createAsyncThunk('appUsers/addUser', async (data, { getState, dispatch }) => {
+  return dispatch(fetchData(getState().user.params))
+})
 
 // ** Delete User
 export const deleteUser = createAsyncThunk('appUsers/deleteUser', async (id, { getState, dispatch }) => {

@@ -38,7 +38,7 @@ import CardStatisticsHorizontal from 'src/@core/components/card-statistics/card-
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteUser } from 'src/store/apps/user'
+import { fetchData, deleteUser, editUser } from 'src/store/apps/user'
 
 // ** Third Party Components
 import axios from 'axios'
@@ -149,7 +149,7 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
     stateEd: state,
     phone: Number(phone)
   }
-  console.log(defaultValues)
+  // console.log(defaultValues)
   const {
     reset,
     control,
@@ -163,7 +163,9 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
   })
 
   const onSubmit = async () => {
-    const dataAll = JSON.stringify({ fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd })
+    const dataAll = JSON.stringify({
+      data: { id, fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd, type: 'edit' }
+    })
     console.log(dataAll)
     const customConfig = {
       headers: {
@@ -171,12 +173,11 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
       }
     }
     await axios
-      .patch('/api/users', dataAll, customConfig)
+      .post('/api/users', dataAll, customConfig)
       .then(async response => {
         console.log(response)
-        // dispatch(addUser({ ...data, role }))
-        // reset()
-        // toggle()
+        dispatch(editUser({ ...dataAll, role }))
+        setShow(false), setAnchorEl(null), reset()
       })
       .catch(() => {
         console.log('gagal')
@@ -228,11 +229,11 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
           maxWidth='md'
           scroll='body'
           onClose={() => {
-            setShow(false), setAnchorEl(null), defaultValues
+            setShow(false), setAnchorEl(null), reset()
           }}
           TransitionComponent={Transition}
           onBackdropClick={() => {
-            setShow(false), setAnchorEl(null), defaultValues
+            setShow(false), setAnchorEl(null), reset()
           }}
         >
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -247,7 +248,7 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
               <IconButton
                 size='small'
                 onClick={() => {
-                  setShow(false), setAnchorEl(null), defaultValues
+                  setShow(false), setAnchorEl(null), reset()
                 }}
                 sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
               >
@@ -382,7 +383,7 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
                 variant='outlined'
                 color='secondary'
                 onClick={() => {
-                  setShow(false), setAnchorEl(null), defaultValues
+                  setShow(false), setAnchorEl(null), reset()
                 }}
               >
                 Discard
