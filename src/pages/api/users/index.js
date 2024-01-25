@@ -78,6 +78,9 @@ export default async (req, res) => {
         console.log(result)
         res.status(200).json({ status: 'Successs Deleted Users' })
         break
+      case 'PATCH':
+        console.log('asd')
+        break
 
       default:
         res.status(405).end(`${method} Not Allowed`)

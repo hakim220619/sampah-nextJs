@@ -124,24 +124,32 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
     dispatch(deleteUser(id))
     handleRowOptionsClose()
   }
-  const schema = yup.object().shape({
-    address: yup.string().required(),
-    email: yup.string().email().required(),
-    phone: yup
-      .number()
-      .typeError('Contact Number field is required')
-      .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
-      .required(),
-    fullName: yup
-      .string()
-      .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
-      .required(),
-    password: yup
-      .string()
-      .min(3, obj => showErrors('Password', obj.value.length, obj.min))
-      .required()
-  })
-
+  // const schema = yup.object().shape({
+  //   address: yup.string().required(),
+  //   email: yup.string().email().required(),
+  //   phone: yup
+  //     .number()
+  //     .typeError('Contact Number field is required')
+  //     .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
+  //     .required(),
+  //   fullName: yup
+  //     .string()
+  //     .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
+  //     .required(),
+  //   password: yup
+  //     .string()
+  //     .min(3, obj => showErrors('Password', obj.value.length, obj.min))
+  //     .required()
+  // })
+  const defaultValues = {
+    emailEd: email,
+    roleEd: role,
+    addressEd: address,
+    fullNameEd: fullName,
+    stateEd: state,
+    phone: Number(phone)
+  }
+  console.log(defaultValues)
   const {
     reset,
     control,
@@ -149,24 +157,26 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
 
     formState: { errors }
   } = useForm({
-    mode: 'onChange',
-    resolver: yupResolver(schema)
+    defaultValues,
+    mode: 'onChange'
+    // resolver: yupResolver(schema)
   })
 
-  const onSubmit = async data => {
-    const dataAll = JSON.stringify({ data, role })
+  const onSubmit = async () => {
+    const dataAll = JSON.stringify({ fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd })
+    console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json'
       }
     }
     await axios
-      .post('/api/users', dataAll, customConfig)
+      .patch('/api/users', dataAll, customConfig)
       .then(async response => {
         console.log(response)
-        dispatch(addUser({ ...data, role }))
-        reset()
-        toggle()
+        // dispatch(addUser({ ...data, role }))
+        // reset()
+        // toggle()
       })
       .catch(() => {
         console.log('gagal')
@@ -218,11 +228,11 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
           maxWidth='md'
           scroll='body'
           onClose={() => {
-            setShow(false), setAnchorEl(null)
+            setShow(false), setAnchorEl(null), defaultValues
           }}
           TransitionComponent={Transition}
           onBackdropClick={() => {
-            setShow(false), setAnchorEl(null)
+            setShow(false), setAnchorEl(null), defaultValues
           }}
         >
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -237,7 +247,7 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
               <IconButton
                 size='small'
                 onClick={() => {
-                  setShow(false), setAnchorEl(null)
+                  setShow(false), setAnchorEl(null), defaultValues
                 }}
                 sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
               >
@@ -372,7 +382,7 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
                 variant='outlined'
                 color='secondary'
                 onClick={() => {
-                  setShow(false), setAnchorEl(null)
+                  setShow(false), setAnchorEl(null), defaultValues
                 }}
               >
                 Discard
