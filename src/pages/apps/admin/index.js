@@ -504,15 +504,10 @@ const columns = [
 ]
 
 const UserList = ({ apiData }) => {
-  // ** State
-  const [role, setRole] = useState('')
-  const [plan, setPlan] = useState('')
   const [value, setValue] = useState('')
-  const [state, setStatus] = useState('')
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
-  // console.log(apiData)
-  // ** Hooks
+
   const dispatch = useDispatch()
   const store = useSelector(state => state.user)
   useEffect(() => {
@@ -522,10 +517,8 @@ const UserList = ({ apiData }) => {
       })
     )
   }, [dispatch, value])
-  // console.log(store)
   const handleFilter = useCallback(val => {
     setValue(val)
-    // console.log(val)
   }, [])
 
   const toggleAddUserDialog = () => setAddUserOpen(!addUserOpen)
@@ -558,7 +551,6 @@ const UserList = ({ apiData }) => {
 export const getStaticProps = async () => {
   const res = await axios.get('http://localhost:3000/api/users')
   const apiData = res.data
-  // console.log(apiData)
   return {
     props: {
       apiData
