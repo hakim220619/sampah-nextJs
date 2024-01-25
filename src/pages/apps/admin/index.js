@@ -53,6 +53,11 @@ import TextField from '@mui/material/TextField'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 import Fade from '@mui/material/Fade'
+
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm, Controller } from 'react-hook-form'
+import FormHelperText from '@mui/material/FormHelperText'
 // ** Vars
 const userRoleObj = {
   admin: { icon: 'mdi:laptop', color: 'error.main' },
@@ -60,6 +65,15 @@ const userRoleObj = {
   editor: { icon: 'mdi:pencil-outline', color: 'info.main' },
   maintainer: { icon: 'mdi:chart-donut', color: 'success.main' },
   subscriber: { icon: 'mdi:account-outline', color: 'primary.main' }
+}
+const showErrors = (field, valueLen, min) => {
+  if (valueLen === 0) {
+    return `${field} field is required`
+  } else if (valueLen > 0 && valueLen < min) {
+    return `${field} must be at least ${min} characters`
+  } else {
+    return ''
+  }
 }
 
 const userStatusObj = {
@@ -81,85 +95,7 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   }
 }))
 
-const openModalEdit = params => {
-  // console.log(params)
-  const [show, setShow] = useState(true)
-  return (
-    <Card>
-      <Dialog
-        fullWidth
-        open={show}
-        maxWidth='md'
-        scroll='body'
-        onClose={() => setShow(false)}
-        TransitionComponent={Transition}
-        onBackdropClick={() => setShow(false)}
-      >
-        <DialogContent
-          sx={{
-            position: 'relative',
-            pb: theme => `${theme.spacing(8)} !important`,
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-          }}
-        >
-          <IconButton
-            size='small'
-            onClick={() => setShow(false)}
-            sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
-          >
-            <Icon icon='mdi:close' />
-          </IconButton>
-          <Box sx={{ mb: 8, textAlign: 'center' }}>
-            <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
-              Edit User Information
-            </Typography>
-            <Typography variant='body2'>Updating user details will receive a privacy audit.</Typography>
-          </Box>
-          <Grid container spacing={6}>
-            <Grid item sm={6} xs={12}>
-              <TextField fullWidth defaultValue='Oliver' label='First Name' placeholder='John' />
-            </Grid>
-            <Grid item sm={6} xs={12}>
-              <TextField fullWidth defaultValue='Queen' label='Last Name' placeholder='Doe' />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth defaultValue='oliverQueen' label='Username' placeholder='johnDoe' />
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Switch defaultChecked />}
-                label='Make this default shipping address'
-                sx={{
-                  '& .MuiFormControlLabel-label': {
-                    color: 'text.secondary'
-                  }
-                }}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            justifyContent: 'center',
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
-          }}
-        >
-          <Button variant='contained' sx={{ mr: 2 }} onClick={() => setShow(false)}>
-            Submit
-          </Button>
-          <Button variant='outlined' color='secondary' onClick={() => setShow(false)}>
-            Discard
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Card>
-  )
-}
-
-const RowOptions = ({ id, fullName, email, role, state }) => {
+const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
   // ** Hooks
   const dispatch = useDispatch()
   // console.log(fullName)
@@ -168,7 +104,14 @@ const RowOptions = ({ id, fullName, email, role, state }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [EditUserOpen, setEditUserOpen] = useState(false)
   const rowOptionsOpen = Boolean(anchorEl)
-  const toggleEditUserDialog = () => setEditUserOpen(!EditUserOpen)
+  const [show, setShow] = useState(false)
+  const [fullNameEd, setFullname] = useState(fullName)
+  const [emailEd, setEmail] = useState(email)
+  const [roleEd, setRole] = useState(role)
+  const [stateEd, setState] = useState(state)
+  const [phoneEd, setPhone] = useState(phone)
+  const [addressEd, setAddress] = useState(address)
+
   const handleRowOptionsClick = event => {
     setAnchorEl(event.currentTarget)
   }
@@ -180,6 +123,54 @@ const RowOptions = ({ id, fullName, email, role, state }) => {
   const handleDelete = () => {
     dispatch(deleteUser(id))
     handleRowOptionsClose()
+  }
+  const schema = yup.object().shape({
+    address: yup.string().required(),
+    email: yup.string().email().required(),
+    phone: yup
+      .number()
+      .typeError('Contact Number field is required')
+      .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
+      .required(),
+    fullName: yup
+      .string()
+      .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
+      .required(),
+    password: yup
+      .string()
+      .min(3, obj => showErrors('Password', obj.value.length, obj.min))
+      .required()
+  })
+
+  const {
+    reset,
+    control,
+    handleSubmit,
+
+    formState: { errors }
+  } = useForm({
+    mode: 'onChange',
+    resolver: yupResolver(schema)
+  })
+
+  const onSubmit = async data => {
+    const dataAll = JSON.stringify({ data, role })
+    const customConfig = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    await axios
+      .post('/api/users', dataAll, customConfig)
+      .then(async response => {
+        console.log(response)
+        dispatch(addUser({ ...data, role }))
+        reset()
+        toggle()
+      })
+      .catch(() => {
+        console.log('gagal')
+      })
   }
 
   return (
@@ -211,8 +202,8 @@ const RowOptions = ({ id, fullName, email, role, state }) => {
           <Icon icon='mdi:eye-outline' fontSize={20} />
           View
         </MenuItem>
-        <MenuItem onClick={() => openModalEdit(true)} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} onClick />
+        <MenuItem onClick={() => setShow(true)} sx={{ '& svg': { mr: 2 } }}>
+          <Icon icon='mdi:pencil-outline' fontSize={20} />
           Edit
         </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
@@ -220,6 +211,176 @@ const RowOptions = ({ id, fullName, email, role, state }) => {
           Delete
         </MenuItem>
       </Menu>
+      <Card>
+        <Dialog
+          fullWidth
+          open={show}
+          maxWidth='md'
+          scroll='body'
+          onClose={() => {
+            setShow(false), setAnchorEl(null)
+          }}
+          TransitionComponent={Transition}
+          onBackdropClick={() => {
+            setShow(false), setAnchorEl(null)
+          }}
+        >
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <DialogContent
+              sx={{
+                position: 'relative',
+                pb: theme => `${theme.spacing(8)} !important`,
+                px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+                pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+              }}
+            >
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setShow(false), setAnchorEl(null)
+                }}
+                sx={{ position: 'absolute', right: '1rem', top: '1rem' }}
+              >
+                <Icon icon='mdi:close' />
+              </IconButton>
+              <Box sx={{ mb: 8, textAlign: 'center' }}>
+                <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
+                  Edit Users
+                </Typography>
+              </Box>
+
+              <Grid container spacing={6}>
+                <Grid item sm={6} xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <TextField
+                      value={fullNameEd}
+                      label='Full Name'
+                      onChange={e => setFullname(e.target.value)}
+                      placeholder='John Doe'
+                      error={Boolean(errors.fullName)}
+                    />
+
+                    {errors.fullName && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.fullName.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <TextField
+                      type='email'
+                      value={emailEd}
+                      label='Email'
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder='johndoe@email.com'
+                      error={Boolean(errors.email)}
+                    />
+
+                    {errors.email && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <InputLabel id='role-select'>Select Role</InputLabel>
+                    <Select
+                      fullWidth
+                      value={roleEd}
+                      id='select-role'
+                      label='Select Role'
+                      labelId='role-select'
+                      onChange={e => setRole(e.target.value)}
+                      inputProps={{ placeholder: 'Select Role' }}
+                    >
+                      <MenuItem value='admin'>Admin</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <InputLabel id='role-select'>Select State</InputLabel>
+                    <Select
+                      fullWidth
+                      value={stateEd}
+                      id='select-state'
+                      label='Select State'
+                      labelId='state-select'
+                      onChange={e => setState(e.target.value)}
+                      inputProps={{ placeholder: 'Select State' }}
+                    >
+                      <MenuItem value='ON'>ON</MenuItem>
+                      <MenuItem value='OFF'>OFF</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item sm={12} xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <TextField
+                      type='number'
+                      value={phoneEd}
+                      label='Phone'
+                      onChange={e => setPhone(e.target.value)}
+                      placeholder='(397) 294-5153'
+                      error={Boolean(errors.phone)}
+                    />
+
+                    {errors.contact && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.contact.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <TextField
+                      value={addressEd}
+                      label='Address'
+                      onChange={e => setAddress(e.target.value)}
+                      placeholder='Jl hr **'
+                      error={Boolean(errors.address)}
+                    />
+
+                    {errors.company && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.company.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={<Switch defaultChecked />}
+                    label='Make this default shipping address'
+                    sx={{
+                      '& .MuiFormControlLabel-label': {
+                        color: 'text.secondary'
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions
+              sx={{
+                justifyContent: 'center',
+                px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
+                pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+              }}
+            >
+              <Button variant='contained' sx={{ mr: 2 }} type='submit'>
+                Submit
+              </Button>
+              <Button
+                variant='outlined'
+                color='secondary'
+                onClick={() => {
+                  setShow(false), setAnchorEl(null)
+                }}
+              >
+                Discard
+              </Button>
+            </DialogActions>
+          </form>
+        </Dialog>
+      </Card>
     </>
   )
 }
@@ -286,13 +447,47 @@ const columns = [
     }
   },
   {
+    flex: 0.2,
+    minWidth: 250,
+    field: 'phone',
+    headerName: 'Phone',
+    renderCell: ({ row }) => {
+      return (
+        <Typography noWrap variant='body2'>
+          {row.phone}
+        </Typography>
+      )
+    }
+  },
+  {
+    flex: 0.2,
+    minWidth: 250,
+    field: 'address',
+    headerName: 'Address',
+    renderCell: ({ row }) => {
+      return (
+        <Typography noWrap variant='body2'>
+          {row.address}
+        </Typography>
+      )
+    }
+  },
+  {
     flex: 0.1,
     minWidth: 90,
     sortable: false,
     field: 'actions',
     headerName: 'Actions',
     renderCell: ({ row }) => (
-      <RowOptions id={row.id} fullName={row.fullName} email={row.email} role={row.role} state={row.state} />
+      <RowOptions
+        id={row.id}
+        fullName={row.fullName}
+        email={row.email}
+        role={row.role}
+        state={row.state}
+        phone={row.phone}
+        address={row.address}
+      />
     )
   }
 ]

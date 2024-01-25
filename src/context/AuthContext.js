@@ -34,6 +34,8 @@ const AuthProvider = ({ children }) => {
       const userData = window.localStorage.getItem('userData')
       const refreshToken = window.localStorage.getItem('refreshToken')
       console.log(storedToken)
+      console.log(userData)
+      console.log(refreshToken)
       // localStorage.removeItem('userData')
       // localStorage.removeItem('refreshToken')
       // localStorage.removeItem('accessToken')
@@ -64,6 +66,7 @@ const AuthProvider = ({ children }) => {
         localStorage.removeItem('userData')
         localStorage.removeItem('refreshToken')
         localStorage.removeItem('accessToken')
+        // router.push('/login')
       }
     }
     initAuth()
