@@ -33,6 +33,9 @@ import { addUser } from 'src/store/apps/user'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
+import RoleOptions from './role'
+import { options } from '@fullcalendar/core/preact'
+
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
 })
@@ -57,8 +60,8 @@ const showErrors = (field, valueLen, min) => {
 const DialogEditUserInfo = props => {
   // ** States
   const { show, toggle } = props
-
-  const [role, setRole] = useState('admin')
+  const [options, setOptions] = useState()
+  const [role, setRole] = useState([])
   const dispatch = useDispatch()
   const schema = yup.object().shape({
     address: yup.string().required(),
@@ -100,22 +103,23 @@ const DialogEditUserInfo = props => {
 
   const onSubmit = async data => {
     const dataAll = JSON.stringify({ data, role })
+    console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json'
       }
     }
-    await axios
-      .post('/api/users', dataAll, customConfig)
-      .then(async response => {
-        // console.log(response)
-        dispatch(addUser({ ...data, role }))
-        reset()
-        toggle()
-      })
-      .catch(() => {
-        console.log('gagal')
-      })
+    // await axios
+    //   .post('/api/users', dataAll, customConfig)
+    //   .then(async response => {
+    //     // console.log(response)
+    //     dispatch(addUser({ ...data, role }))
+    //     reset()
+    //     toggle()
+    //   })
+    //   .catch(() => {
+    //     console.log('gagal')
+    //   })
   }
 
   const handleclose = event => {
@@ -220,7 +224,7 @@ const DialogEditUserInfo = props => {
                   )}
                 </FormControl>
               </Grid>
-              <Grid item sm={6} xs={12}>
+              {/* <Grid item sm={6} xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <InputLabel id='role-select'>Select Role</InputLabel>
                   <Select
@@ -235,7 +239,9 @@ const DialogEditUserInfo = props => {
                     <MenuItem value='admin'>Admin</MenuItem>
                   </Select>
                 </FormControl>
-              </Grid>
+                
+              </Grid> */}
+              <RoleOptions />
               <Grid item sm={12} xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <Controller
