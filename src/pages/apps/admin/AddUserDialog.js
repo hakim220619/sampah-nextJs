@@ -35,6 +35,9 @@ import axios from 'axios'
 import { addUser } from 'src/store/apps/user'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+// ** CleaveJS Imports
+import Cleave from 'cleave.js/react'
+import 'cleave.js/dist/addons/cleave-phone.id'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -418,7 +421,7 @@ const AddDialogUsers = props => {
                         value={value}
                         label='Phone'
                         onChange={onChange}
-                        placeholder='(397) 294-5153'
+                        placeholder='(62) 857-5153'
                         error={Boolean(errors.phone)}
                       />
                     )}
@@ -428,6 +431,7 @@ const AddDialogUsers = props => {
                   )}
                 </FormControl>
               </Grid>
+
               <Grid item xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <Controller

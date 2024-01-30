@@ -15,22 +15,14 @@ const navigation = () => {
           path: '/apps/admin'
         },
         {
-          title: 'User',
-          path: '/apps/invoice/preview'
-        },
-        {
-          title: 'Edit',
-          path: '/apps/invoice/edit'
-        },
-        {
-          title: 'Add',
-          path: '/apps/invoice/add'
+          title: 'Wilayah',
+          path: '/apps/wilayah'
         }
       ]
     },
     {
       title: 'Post',
-      icon: 'mdi:home-outline'
+      icon: 'mdi-newspaper'
     }
   ]
 }
