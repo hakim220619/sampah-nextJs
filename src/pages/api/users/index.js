@@ -69,7 +69,7 @@ export default async (req, res) => {
               req.body.data.id +
               '" '
           })
-          console.log(response)
+          // console.log(response)
           res.status(201).json({ status: 'Successs Update Users' })
         } else {
           var today = new Date(),
@@ -86,11 +86,11 @@ export default async (req, res) => {
               today.getMinutes() +
               ':' +
               today.getSeconds()
-          // console.log(req.body)
+          // console.log(req.body.role)
           const hashedPassword = await bcrypt.hash(req.body.data.password, 10)
           const response = await excuteQuery({
             query:
-              'INSERT INTO users (fullName , email , phone, address, role, password, state, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ',
+              'INSERT INTO users (fullName , email , phone, address, role, password, state, created_at, provinceId, regencyId, districtId, villageId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
             values: [
               req.body.data.fullName,
               req.body.data.email,
@@ -99,7 +99,11 @@ export default async (req, res) => {
               req.body.role,
               hashedPassword,
               'ON',
-              date
+              date,
+              req.body.province,
+              req.body.regency,
+              req.body.district,
+              req.body.village
             ]
           })
           console.log(response)

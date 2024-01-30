@@ -1,5 +1,8 @@
 // ** React Imports
-import { useState, forwardRef } from 'react'
+import { useState, forwardRef, useEffect } from 'react'
+
+// ** Config
+import authConfig from 'src/configs/auth'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -33,9 +36,6 @@ import { addUser } from 'src/store/apps/user'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-import RoleOptions from './role'
-import { options } from '@fullcalendar/core/preact'
-
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
 })
@@ -57,11 +57,12 @@ const showErrors = (field, valueLen, min) => {
   }
 }
 
-const DialogEditUserInfo = props => {
+const AddDialogUsers = props => {
   // ** States
+  const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
   const { show, toggle } = props
   const [options, setOptions] = useState()
-  const [role, setRole] = useState([])
+  // const [role, setRole] = useState([])
   const dispatch = useDispatch()
   const schema = yup.object().shape({
     address: yup.string().required(),
@@ -90,6 +91,42 @@ const DialogEditUserInfo = props => {
     phone: Number('')
   }
 
+  const [values, setValues] = useState([])
+
+  const [role, setrole] = useState()
+  const [valuesProvince, setValProvince] = useState([])
+  const [province, setProvince] = useState()
+  const [valuesRegency, setValRegency] = useState([])
+  const [regency, setRegency] = useState()
+  const [valuesDistrict, setValDistrict] = useState([])
+  const [district, setDistrict] = useState()
+  const [valuesVillage, setValVillage] = useState([])
+  const [village, setVillage] = useState()
+
+  //   console.log(role)
+  useEffect(() => {
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    axios
+      .get('/api/role', {
+        headers: {
+          Authorization: storedToken
+        }
+      })
+      .then(response => response.data.data)
+      .then(val => setValues(val))
+    axios
+      .get('/api/province', {
+        headers: {
+          Authorization: storedToken
+        }
+      })
+      .then(response => response.data.data)
+      .then(val => setValProvince(val))
+    // console.log(province)
+    // console.log(regency)
+    // console.log(changeRegency)
+  }, [])
+
   const {
     reset,
     control,
@@ -100,26 +137,65 @@ const DialogEditUserInfo = props => {
     mode: 'onChange',
     resolver: yupResolver(schema)
   })
+  const onRegency = async data => {
+    axios
+      .get('/api/regency', {
+        params: {
+          data
+        },
+        headers: {
+          Authorization: storedToken
+        }
+      })
+      .then(response => response.data.data)
+      .then(val => setValRegency(val))
+  }
+  const onDistrict = async data => {
+    axios
+      .get('/api/district', {
+        params: {
+          data
+        },
+        headers: {
+          Authorization: storedToken
+        }
+      })
+      .then(response => response.data.data)
+      .then(val => setValDistrict(val))
+  }
+  const onVillage = async data => {
+    axios
+      .get('/api/village', {
+        params: {
+          data
+        },
+        headers: {
+          Authorization: storedToken
+        }
+      })
+      .then(response => response.data.data)
+      .then(val => setValVillage(val))
+  }
 
   const onSubmit = async data => {
-    const dataAll = JSON.stringify({ data, role })
+    const dataAll = JSON.stringify({ data, role, province, regency, district, village })
     console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json'
       }
     }
-    // await axios
-    //   .post('/api/users', dataAll, customConfig)
-    //   .then(async response => {
-    //     // console.log(response)
-    //     dispatch(addUser({ ...data, role }))
-    //     reset()
-    //     toggle()
-    //   })
-    //   .catch(() => {
-    //     console.log('gagal')
-    //   })
+    await axios
+      .post('/api/users', dataAll, customConfig)
+      .then(async response => {
+        // console.log(response)
+        dispatch(addUser({ ...data, role, province, regency, district, village }))
+        reset()
+        toggle()
+      })
+      .catch(() => {
+        console.log('gagal')
+      })
   }
 
   const handleclose = event => {
@@ -224,7 +300,7 @@ const DialogEditUserInfo = props => {
                   )}
                 </FormControl>
               </Grid>
-              {/* <Grid item sm={6} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <InputLabel id='role-select'>Select Role</InputLabel>
                   <Select
@@ -233,15 +309,103 @@ const DialogEditUserInfo = props => {
                     id='select-role'
                     label='Select Role'
                     labelId='role-select'
-                    onChange={e => setRole(e.target.value)}
+                    onChange={e => setrole(e.target.value)}
                     inputProps={{ placeholder: 'Select Role' }}
                   >
-                    <MenuItem value='admin'>Admin</MenuItem>
+                    {values.map((opts, i) => (
+                      <MenuItem key={i} value={opts.code}>
+                        {opts.roleName}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
-                
-              </Grid> */}
-              <RoleOptions />
+              </Grid>
+              <Grid item sm={6} xs={12}>
+                <FormControl fullWidth sx={{ mb: 6 }}>
+                  <InputLabel id='role-select'>Select Province</InputLabel>
+                  <Select
+                    fullWidth
+                    value={province}
+                    id='select-province'
+                    label='Select Province'
+                    labelId='Province-select'
+                    onChange={e => {
+                      onRegency(e.target.value), setProvince(e.target.value)
+                    }}
+                    inputProps={{ placeholder: 'Select Province' }}
+                  >
+                    {valuesProvince.map((opts, i) => (
+                      <MenuItem key={i} value={opts.id}>
+                        {opts.nama}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item sm={6} xs={12}>
+                <FormControl fullWidth sx={{ mb: 6 }}>
+                  <InputLabel id='role-select'>Select Regency</InputLabel>
+                  <Select
+                    fullWidth
+                    value={regency}
+                    id='select-regency'
+                    label='Select Regency'
+                    labelId='Regency-select'
+                    onChange={e => {
+                      setRegency(e.target.value), onDistrict(e.target.value)
+                    }}
+                    inputProps={{ placeholder: 'Select Regency' }}
+                  >
+                    {valuesRegency.map((opts, i) => (
+                      <MenuItem key={i} value={opts.id}>
+                        {opts.nama}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item sm={6} xs={12}>
+                <FormControl fullWidth sx={{ mb: 6 }}>
+                  <InputLabel id='role-select'>Select District</InputLabel>
+                  <Select
+                    fullWidth
+                    value={district}
+                    id='select-district'
+                    label='Select District'
+                    labelId='District-select'
+                    onChange={e => {
+                      setDistrict(e.target.value), onVillage(e.target.value)
+                    }}
+                    inputProps={{ placeholder: 'Select District' }}
+                  >
+                    {valuesDistrict.map((opts, i) => (
+                      <MenuItem key={i} value={opts.id}>
+                        {opts.nama}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item sm={6} xs={12}>
+                <FormControl fullWidth sx={{ mb: 6 }}>
+                  <InputLabel id='role-select'>Select Village</InputLabel>
+                  <Select
+                    fullWidth
+                    value={village}
+                    id='select-village'
+                    label='Select Village'
+                    labelId='Village-select'
+                    onChange={e => setVillage(e.target.value)}
+                    inputProps={{ placeholder: 'Select Village' }}
+                  >
+                    {valuesVillage.map((opts, i) => (
+                      <MenuItem key={i} value={opts.id}>
+                        {opts.nama}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
               <Grid item sm={12} xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <Controller
@@ -318,4 +482,4 @@ const DialogEditUserInfo = props => {
   )
 }
 
-export default DialogEditUserInfo
+export default AddDialogUsers

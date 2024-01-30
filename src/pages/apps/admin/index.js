@@ -46,13 +46,14 @@ import axios from 'axios'
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
 import AddUserDialog from 'src/pages/apps/admin/AddUserDialog'
-import EditUserDialog from 'src/pages/apps/admin/EditUserDialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Switch from '@mui/material/Switch'
 import Fade from '@mui/material/Fade'
+// ** Config
+import authConfig from 'src/configs/auth'
 
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -60,11 +61,11 @@ import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
 // ** Vars
 const userRoleObj = {
-  admin: { icon: 'mdi:laptop', color: 'error.main' },
-  author: { icon: 'mdi:cog-outline', color: 'warning.main' },
-  editor: { icon: 'mdi:pencil-outline', color: 'info.main' },
-  maintainer: { icon: 'mdi:chart-donut', color: 'success.main' },
-  subscriber: { icon: 'mdi:account-outline', color: 'primary.main' }
+  ADM: { icon: 'mdi:laptop', color: 'error.main' },
+  ADW: { icon: 'mdi:cog-outline', color: 'warning.main' },
+  PLG: { icon: 'mdi:pencil-outline', color: 'info.main' }
+  // maintainer: { icon: 'mdi:chart-donut', color: 'success.main' },
+  // subscriber: { icon: 'mdi:account-outline', color: 'primary.main' }
 }
 const showErrors = (field, valueLen, min) => {
   if (valueLen === 0) {
@@ -149,6 +150,20 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
     stateEd: state,
     phone: Number(phone)
   }
+  const [values, setValues] = useState([])
+  // const [role, setrole] = useState()
+  //   console.log(role)
+  useEffect(() => {
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    axios
+      .get('http://localhost:3000/api/role', {
+        headers: {
+          Authorization: storedToken
+        }
+      })
+      .then(response => response.data.data)
+      .then(val => setValues(val))
+  }, [])
   // console.log(defaultValues)
   const {
     reset,
@@ -304,7 +319,11 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
                       onChange={e => setRole(e.target.value)}
                       inputProps={{ placeholder: 'Select Role' }}
                     >
-                      <MenuItem value='admin'>Admin</MenuItem>
+                      {values.map((opts, i) => (
+                        <MenuItem key={i} value={opts.code}>
+                          {opts.roleName}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
