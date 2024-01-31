@@ -22,7 +22,8 @@ const navigation = () => {
     },
     {
       title: 'Post',
-      icon: 'mdi-newspaper'
+      icon: 'mdi-newspaper',
+      path: '/apps/post'
     }
   ]
 }
