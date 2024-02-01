@@ -8,7 +8,7 @@ import Icon from 'src/@core/components/icon'
 
 const TableHeader = props => {
   // ** Props
-  const { handleFilter, toggle, value } = props
+  const { handleFilter, toggle, value, name } = props
 
   return (
     <Box sx={{ p: 5, pb: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -30,7 +30,7 @@ const TableHeader = props => {
         />
 
         <Button sx={{ mb: 2 }} onClick={toggle} variant='contained'>
-          Add User
+          Add {name}
         </Button>
       </Box>
     </Box>

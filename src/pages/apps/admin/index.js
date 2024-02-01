@@ -181,7 +181,7 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
     const dataAll = JSON.stringify({
       data: { id, fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd, type: 'edit' }
     })
-    console.log(dataAll)
+    // console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
     await axios
       .post('/api/users', dataAll, customConfig)
       .then(async response => {
-        console.log(response)
+        // console.log(response)
         dispatch(editUser({ ...dataAll, role }))
         setShow(false), setAnchorEl(null), reset()
       })
@@ -528,7 +528,8 @@ const UserList = ({ apiData }) => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
 
   const dispatch = useDispatch()
-  const store = useSelector(state => state.user)
+  const store = useSelector(state => apiData.allData)
+  console.log(store)
   useEffect(() => {
     dispatch(
       fetchData({
@@ -547,10 +548,10 @@ const UserList = ({ apiData }) => {
       <Grid item xs={12}>
         <Card>
           <Divider />
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} />
+          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} name='Users' />
           <DataGrid
             autoHeight
-            rows={store.data}
+            rows={store}
             columns={columns}
             checkboxSelection
             disableRowSelectionOnClick
@@ -568,7 +569,11 @@ const UserList = ({ apiData }) => {
 }
 
 export const getStaticProps = async () => {
-  const res = await axios.get('http://localhost:3000/api/users')
+  const res = await axios.get('http://localhost:3000/api/users', {
+    params: {
+      params: 'getUsersAll'
+    }
+  })
   const apiData = res.data
   return {
     props: {

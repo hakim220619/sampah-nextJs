@@ -60,7 +60,7 @@ const showErrors = (field, valueLen, min) => {
   }
 }
 
-const AddDialogUsers = props => {
+const AddDialogWilayah = props => {
   // ** States
   const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
   const { show, toggle } = props
@@ -94,40 +94,25 @@ const AddDialogUsers = props => {
     phone: Number('')
   }
 
-  const [values, setValues] = useState([])
+  // const [values, setValues] = useState([])
 
   const [role, setrole] = useState()
-  const [valuesProvince, setValProvince] = useState([])
-  const [province, setProvince] = useState()
-  const [valuesRegency, setValRegency] = useState([])
-  const [regency, setRegency] = useState()
-  const [valuesDistrict, setValDistrict] = useState([])
-  const [district, setDistrict] = useState()
-  const [valuesVillage, setValVillage] = useState([])
-  const [village, setVillage] = useState()
+  const [valuesUsers, setValUsers] = useState([])
+  const [users, setUsers] = useState()
 
   //   console.log(role)
   useEffect(() => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     axios
-      .get('/api/role', {
-        headers: {
-          Authorization: storedToken
+      .get('/api/users', {
+        params: {
+          params: 'getUsersAdminWilayah'
         }
       })
-      .then(response => response.data.data)
-      .then(val => setValues(val))
-    axios
-      .get('/api/province', {
-        headers: {
-          Authorization: storedToken
-        }
+      .then(response => response.data.allData)
+      .then(val => {
+        setValUsers(val)
       })
-      .then(response => response.data.data)
-      .then(val => setValProvince(val))
-    // console.log(province)
-    // console.log(regency)
-    // console.log(changeRegency)
   }, [])
 
   const {
@@ -140,49 +125,10 @@ const AddDialogUsers = props => {
     mode: 'onChange',
     resolver: yupResolver(schema)
   })
-  const onRegency = async data => {
-    axios
-      .get('/api/regency', {
-        params: {
-          data
-        },
-        headers: {
-          Authorization: storedToken
-        }
-      })
-      .then(response => response.data.data)
-      .then(val => setValRegency(val))
-  }
-  const onDistrict = async data => {
-    axios
-      .get('/api/district', {
-        params: {
-          data
-        },
-        headers: {
-          Authorization: storedToken
-        }
-      })
-      .then(response => response.data.data)
-      .then(val => setValDistrict(val))
-  }
-  const onVillage = async data => {
-    axios
-      .get('/api/village', {
-        params: {
-          data
-        },
-        headers: {
-          Authorization: storedToken
-        }
-      })
-      .then(response => response.data.data)
-      .then(val => setValVillage(val))
-  }
 
   const onSubmit = async data => {
-    const dataAll = JSON.stringify({ data, role, province, regency, district, village })
-    console.log(dataAll)
+    const dataAll = JSON.stringify({ data, users })
+    // console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json'
@@ -192,7 +138,7 @@ const AddDialogUsers = props => {
       .post('/api/users', dataAll, customConfig)
       .then(async response => {
         // console.log(response)
-        dispatch(addUser({ ...data, role, province, regency, district, village }))
+        dispatch(addUser({ ...data, role }))
         reset()
         toggle()
       })
@@ -234,222 +180,69 @@ const AddDialogUsers = props => {
             </IconButton>
             <Box sx={{ mb: 8, textAlign: 'center' }}>
               <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
-                Add Users
+                Add Wilayah
               </Typography>
             </Box>
 
             <Grid container spacing={6}>
-              <Grid item sm={6} xs={12}>
+              <Grid item sm={12} xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <Controller
-                    name='fullName'
+                    name='name'
                     control={control}
                     rules={{ required: true }}
                     render={({ field: { value, onChange } }) => (
                       <TextField
                         value={value}
-                        label='Full Name'
+                        label='Nama Wilayah'
                         onChange={onChange}
-                        placeholder='John Doe'
-                        error={Boolean(errors.fullName)}
+                        placeholder='Wilayah A'
+                        error={Boolean(errors.name)}
                       />
                     )}
                   />
-                  {errors.fullName && (
-                    <FormHelperText sx={{ color: 'error.main' }}>{errors.fullName.message}</FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <FormControl fullWidth sx={{ mb: 6 }}>
-                  <Controller
-                    name='email'
-                    control={control}
-                    rules={{ required: false }}
-                    render={({ field: { value, onChange } }) => (
-                      <TextField
-                        type='email'
-                        value={value}
-                        label='Email'
-                        onChange={onChange}
-                        placeholder='johndoe@email.com'
-                        error={Boolean(errors.email)}
-                      />
-                    )}
-                  />
-                  {errors.email && <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>}
-                </FormControl>
-              </Grid>
-
-              <Grid item sm={6} xs={12}>
-                <FormControl fullWidth sx={{ mb: 6 }}>
-                  <Controller
-                    name='password'
-                    control={control}
-                    rules={{ required: false }}
-                    render={({ field: { value, onChange } }) => (
-                      <TextField
-                        type='password'
-                        value={value}
-                        label='Password'
-                        onChange={onChange}
-                        placeholder='*******'
-                        error={Boolean(errors.password)}
-                      />
-                    )}
-                  />
-                  {errors.password && (
-                    <FormHelperText sx={{ color: 'error.main' }}>{errors.password.message}</FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <FormControl fullWidth sx={{ mb: 6 }}>
-                  <InputLabel id='role-select'>Select Role</InputLabel>
-                  <Select
-                    fullWidth
-                    value={role}
-                    id='select-role'
-                    label='Select Role'
-                    labelId='role-select'
-                    onChange={e => setrole(e.target.value)}
-                    inputProps={{ placeholder: 'Select Role' }}
-                  >
-                    {values.map((opts, i) => (
-                      <MenuItem key={i} value={opts.code}>
-                        {opts.roleName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <FormControl fullWidth sx={{ mb: 6 }}>
-                  <InputLabel id='role-select'>Select Province</InputLabel>
-                  <Select
-                    fullWidth
-                    value={province}
-                    id='select-province'
-                    label='Select Province'
-                    labelId='Province-select'
-                    onChange={e => {
-                      onRegency(e.target.value), setProvince(e.target.value)
-                    }}
-                    inputProps={{ placeholder: 'Select Province' }}
-                  >
-                    {valuesProvince.map((opts, i) => (
-                      <MenuItem key={i} value={opts.id}>
-                        {opts.nama}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <FormControl fullWidth sx={{ mb: 6 }}>
-                  <InputLabel id='role-select'>Select Regency</InputLabel>
-                  <Select
-                    fullWidth
-                    value={regency}
-                    id='select-regency'
-                    label='Select Regency'
-                    labelId='Regency-select'
-                    onChange={e => {
-                      setRegency(e.target.value), onDistrict(e.target.value)
-                    }}
-                    inputProps={{ placeholder: 'Select Regency' }}
-                  >
-                    {valuesRegency.map((opts, i) => (
-                      <MenuItem key={i} value={opts.id}>
-                        {opts.nama}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <FormControl fullWidth sx={{ mb: 6 }}>
-                  <InputLabel id='role-select'>Select District</InputLabel>
-                  <Select
-                    fullWidth
-                    value={district}
-                    id='select-district'
-                    label='Select District'
-                    labelId='District-select'
-                    onChange={e => {
-                      setDistrict(e.target.value), onVillage(e.target.value)
-                    }}
-                    inputProps={{ placeholder: 'Select District' }}
-                  >
-                    {valuesDistrict.map((opts, i) => (
-                      <MenuItem key={i} value={opts.id}>
-                        {opts.nama}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item sm={6} xs={12}>
-                <FormControl fullWidth sx={{ mb: 6 }}>
-                  <InputLabel id='role-select'>Select Village</InputLabel>
-                  <Select
-                    fullWidth
-                    value={village}
-                    id='select-village'
-                    label='Select Village'
-                    labelId='Village-select'
-                    onChange={e => setVillage(e.target.value)}
-                    inputProps={{ placeholder: 'Select Village' }}
-                  >
-                    {valuesVillage.map((opts, i) => (
-                      <MenuItem key={i} value={opts.id}>
-                        {opts.nama}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  {errors.name && <FormHelperText sx={{ color: 'error.main' }}>{errors.name.message}</FormHelperText>}
                 </FormControl>
               </Grid>
               <Grid item sm={12} xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
-                  <Controller
-                    name='phone'
-                    control={control}
-                    rules={{ required: false }}
-                    render={({ field: { value, onChange } }) => (
-                      <TextField
-                        type='number'
-                        value={value}
-                        label='Phone'
-                        onChange={onChange}
-                        placeholder='(62) 857-5153'
-                        error={Boolean(errors.phone)}
-                      />
-                    )}
-                  />
-                  {errors.contact && (
-                    <FormHelperText sx={{ color: 'error.main' }}>{errors.contact.message}</FormHelperText>
-                  )}
+                  <InputLabel id='users-select'>Select Users</InputLabel>
+                  <Select
+                    fullWidth
+                    value={users}
+                    id='select-users'
+                    label='Select Users'
+                    labelId='users-select'
+                    onChange={e => setrole(e.target.value)}
+                    inputProps={{ placeholder: 'Select Users' }}
+                  >
+                    {valuesUsers.map((opts, i) => (
+                      <MenuItem key={i} value={opts.id}>
+                        {opts.fullName} - {opts.propinsi} - {opts.kabupaten} - {opts.kecamatan} - {opts.desa}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </FormControl>
               </Grid>
 
               <Grid item xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
                   <Controller
-                    name='address'
+                    name='description'
                     control={control}
                     rules={{ required: false }}
                     render={({ field: { value, onChange } }) => (
                       <TextField
                         value={value}
-                        label='Address'
+                        label='Description'
                         onChange={onChange}
-                        placeholder='Jl hr **'
-                        error={Boolean(errors.address)}
+                        placeholder='qwerty **'
+                        error={Boolean(errors.description)}
                       />
                     )}
                   />
-                  {errors.company && (
-                    <FormHelperText sx={{ color: 'error.main' }}>{errors.company.message}</FormHelperText>
+                  {errors.description && (
+                    <FormHelperText sx={{ color: 'error.main' }}>{errors.description.message}</FormHelperText>
                   )}
                 </FormControl>
               </Grid>
@@ -486,4 +279,4 @@ const AddDialogUsers = props => {
   )
 }
 
-export default AddDialogUsers
+export default AddDialogWilayah

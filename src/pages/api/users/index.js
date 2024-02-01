@@ -6,30 +6,46 @@ export default async (req, res) => {
     // console.log(req)
     switch (req.method) {
       case 'GET':
-        // const storedToken = req.headers.authorization
-        // console.log(storedToken)
-        // if (storedToken) {
-        const data = await excuteQuery({
-          query: 'select * from users'
-        })
+        switch (req.query.params) {
+          case 'getUsersAll':
+            // const storedToken = req.headers.authorization
+            // console.log(req.query.params)
+            // if (storedToken) {
+            const dataAll = await excuteQuery({
+              query: 'select * from users'
+            })
 
-        const { q = '' } = req.query ?? ''
-        const queryLowered = q.toLowerCase()
-        // console.log(data)
-        const filteredData = data.filter(
-          data =>
-            data.email.toLowerCase().includes(queryLowered) ||
-            data.fullName.toLowerCase().includes(queryLowered) ||
-            data.role.toLowerCase().includes(queryLowered)
-        )
+            const { q = '' } = req.query ?? ''
+            const queryLowered = q.toLowerCase()
+            // console.log(dataAll)
+            const filteredData = dataAll.filter(
+              data =>
+                data.email.toLowerCase().includes(queryLowered) ||
+                data.fullName.toLowerCase().includes(queryLowered) ||
+                data.role.toLowerCase().includes(queryLowered)
+            )
 
-        // console.log(filteredData)
-        res
-          .status(200)
-          .json({ allData: data, users: filteredData, params: req.params, total: filteredData.length, rows: 10 })
-        // } else {
-        //   res.status(200).json({ status: false, message: 'Token Invalide' })
-        // }
+            console.log(filteredData)
+            res
+              .status(200)
+              .json({ allData: dataAll, users: filteredData, params: req.params, total: filteredData.length, rows: 10 })
+            // } else {
+            //   res.status(200).json({ status: false, message: 'Token Invalide' })
+            // }
+            break
+          case 'getUsersAdminWilayah':
+            const data = await excuteQuery({
+              query:
+                'select u.*, p.nama as propinsi, k.nama as kabupaten, kc.nama as kecamatan, d.nama as desa from users u, propinsi p, kabupaten k, kecamatan kc, desa d WHERE u.provinceId=p.id AND u.regencyId=k.id AND u.districtId=kc.id and u.villageId=d.id and u.role = ?',
+              values: ['ADW']
+            })
+            // console.log(data)
+            res.status(200).json({ allData: data, status: true })
+            break
+          default:
+            break
+        }
+
         break
 
       case 'POST':

@@ -45,7 +45,7 @@ import axios from 'axios'
 
 // ** Custom Table Components Imports
 import TableHeader from 'src/views/apps/user/list/TableHeader'
-import AddUserDialog from 'src/pages/apps/admin/AddUserDialog'
+import AddWilayahDialog from 'src/pages/apps/wilayah/AddWilayahDialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
@@ -414,6 +414,19 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 250,
+    field: 'fullName',
+    headerName: 'Full Name',
+    renderCell: ({ row }) => {
+      return (
+        <Typography noWrap variant='body2'>
+          {row.fullName}
+        </Typography>
+      )
+    }
+  },
+  {
+    flex: 0.2,
+    minWidth: 250,
     field: 'name',
     headerName: 'Name',
     renderCell: ({ row }) => {
@@ -424,35 +437,20 @@ const columns = [
       )
     }
   },
-  //   {
-  //     flex: 0.2,
-  //     minWidth: 250,
-  //     field: 'email',
-  //     headerName: 'Email',
-  //     renderCell: ({ row }) => {
-  //       return (
-  //         <Typography noWrap variant='body2'>
-  //           {row.email}
-  //         </Typography>
-  //       )
-  //     }
-  //   },
-  //   {
-  //     flex: 0.15,
-  //     field: 'role',
-  //     minWidth: 150,
-  //     headerName: 'Role',
-  //     renderCell: ({ row }) => {
-  //       return (
-  //         <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 3, color: userRoleObj[row.role].color } }}>
-  //           <Icon icon={userRoleObj[row.role].icon} fontSize={20} />
-  //           <Typography noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
-  //             {row.role}
-  //           </Typography>
-  //         </Box>
-  //       )
-  //     }
-  //   },
+
+  {
+    flex: 0.15,
+    field: 'description',
+    minWidth: 150,
+    headerName: 'Description',
+    renderCell: ({ row }) => {
+      return (
+        <Typography noWrap variant='body2'>
+          {row.description}
+        </Typography>
+      )
+    }
+  },
 
   //   {
   //     flex: 0.1,
@@ -526,14 +524,14 @@ const WilayahList = ({ apiData }) => {
     setValue(val)
   }, [])
 
-  const toggleAddUserDialog = () => setAddUserOpen(!addUserOpen)
+  const toggleAddWilayahDialog = () => setAddUserOpen(!addUserOpen)
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <Divider />
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} />
+          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddWilayahDialog} name='Wilayah' />
           <DataGrid
             autoHeight
             rows={store}
@@ -547,7 +545,7 @@ const WilayahList = ({ apiData }) => {
           />
         </Card>
       </Grid>
-      <AddUserDialog show={addUserOpen} toggle={toggleAddUserDialog} />
+      <AddWilayahDialog show={addUserOpen} toggle={toggleAddWilayahDialog} />
     </Grid>
   )
 }

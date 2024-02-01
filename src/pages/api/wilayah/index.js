@@ -10,7 +10,7 @@ export default async (req, res) => {
         // console.log(storedToken)
         // if (storedToken) {
         const data = await excuteQuery({
-          query: 'select * from wilayah'
+          query: 'select w.*, u.fullName from wilayah w, users u where w.userId=u.id'
         })
 
         const { q = '' } = req.query ?? ''
