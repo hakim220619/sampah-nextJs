@@ -1,4 +1,5 @@
 import excuteQuery from 'src/configs/db'
+import datetime from 'src/configs/date'
 import bcrypt from 'bcryptjs'
 
 export default async (req, res) => {
@@ -15,7 +16,7 @@ export default async (req, res) => {
 
         const { q = '' } = req.query ?? ''
         const queryLowered = q.toLowerCase()
-        // console.log(data)
+        // console.log(queryLowered)
         const filteredData = data.filter(
           data =>
             data.name.toLowerCase().includes(queryLowered) || data.description.toLowerCase().includes(queryLowered)
@@ -24,15 +25,22 @@ export default async (req, res) => {
         // console.log(filteredData)
         res
           .status(200)
-          .json({ allData: data, wilayah: filteredData, params: req.params, total: filteredData.length, rows: 10 })
+          .json({ allData: data, data: filteredData, params: req.params, total: filteredData.length, rows: 10 })
         // } else {
         //   res.status(200).json({ status: false, message: 'Token Invalide' })
         // }
         break
 
       case 'POST':
+        const dateTime = await datetime()
         const storedToken = req.headers.authorization
-        console.log(storedToken)
+        console.log(dateTime)
+        const response = await excuteQuery({
+          query: 'INSERT INTO wilayah (userId , name , description, state, created_at) VALUES (?, ?, ?, ?, ? ) ',
+          values: [req.body.usersId, req.body.data.name, req.body.data.description, 'ON', dateTime]
+        })
+        console.log(response)
+        res.status(200).json({ status: 'Successs Insert Data' })
 
         break
 

@@ -528,8 +528,8 @@ const UserList = ({ apiData }) => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
 
   const dispatch = useDispatch()
-  const store = useSelector(state => apiData.allData)
-  console.log(store)
+  const store = useSelector(state => state.user)
+  // console.log(store)
   useEffect(() => {
     dispatch(
       fetchData({
@@ -551,7 +551,7 @@ const UserList = ({ apiData }) => {
           <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} name='Users' />
           <DataGrid
             autoHeight
-            rows={store}
+            rows={store.data}
             columns={columns}
             checkboxSelection
             disableRowSelectionOnClick
@@ -569,11 +569,7 @@ const UserList = ({ apiData }) => {
 }
 
 export const getStaticProps = async () => {
-  const res = await axios.get('http://localhost:3000/api/users', {
-    params: {
-      params: 'getUsersAll'
-    }
-  })
+  const res = await axios.get('http://localhost:3000/api/users')
   const apiData = res.data
   return {
     props: {

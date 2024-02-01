@@ -32,7 +32,7 @@ import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { addUser } from 'src/store/apps/user'
+import { addWilayah } from 'src/store/apps/wilayah'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 // ** CleaveJS Imports
@@ -87,7 +87,7 @@ const AddDialogWilayah = props => {
 
   const [role, setrole] = useState()
   const [valuesUsers, setValUsers] = useState([])
-  const [users, setUsers] = useState()
+  const [usersId, setUsers] = useState()
 
   //   console.log(role)
   useEffect(() => {
@@ -117,7 +117,7 @@ const AddDialogWilayah = props => {
 
   const onSubmit = async data => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    const dataAll = JSON.stringify({ data, users })
+    const dataAll = JSON.stringify({ data, usersId })
     console.log(dataAll)
     const customConfig = {
       headers: {
@@ -129,7 +129,7 @@ const AddDialogWilayah = props => {
       .post('/api/wilayah', dataAll, customConfig)
       .then(async response => {
         // console.log(response)
-        dispatch(addUser({ ...data, role }))
+        dispatch(addWilayah({ ...data, usersId }))
         reset()
         toggle()
       })
@@ -200,7 +200,7 @@ const AddDialogWilayah = props => {
                   <InputLabel id='users-select'>Select Users</InputLabel>
                   <Select
                     fullWidth
-                    value={users}
+                    value={usersId}
                     id='select-users'
                     label='Select Users'
                     labelId='users-select'

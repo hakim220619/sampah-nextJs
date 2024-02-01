@@ -440,6 +440,19 @@ const columns = [
 
   {
     flex: 0.15,
+    field: 'state',
+    minWidth: 150,
+    headerName: 'State',
+    renderCell: ({ row }) => {
+      return (
+        <Typography noWrap variant='body2'>
+          {row.state}
+        </Typography>
+      )
+    }
+  },
+  {
+    flex: 0.15,
     field: 'description',
     minWidth: 150,
     headerName: 'Description',
@@ -509,9 +522,9 @@ const WilayahList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
-  //   console.log(apiData)
+  // console.log(apiData)
   const dispatch = useDispatch()
-  const store = useSelector(state => apiData.wilayah)
+  const store = useSelector(state => state.wilayah)
   console.log(store)
   useEffect(() => {
     dispatch(

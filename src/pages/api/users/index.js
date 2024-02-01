@@ -3,35 +3,11 @@ import bcrypt from 'bcryptjs'
 
 export default async (req, res) => {
   try {
-    // console.log(req)
+    // console.log(req.query)
     switch (req.method) {
       case 'GET':
         switch (req.query.params) {
           case 'getUsersAll':
-            // const storedToken = req.headers.authorization
-            // console.log(req.query.params)
-            // if (storedToken) {
-            const dataAll = await excuteQuery({
-              query: 'select * from users'
-            })
-
-            const { q = '' } = req.query ?? ''
-            const queryLowered = q.toLowerCase()
-            // console.log(dataAll)
-            const filteredData = dataAll.filter(
-              data =>
-                data.email.toLowerCase().includes(queryLowered) ||
-                data.fullName.toLowerCase().includes(queryLowered) ||
-                data.role.toLowerCase().includes(queryLowered)
-            )
-
-            console.log(filteredData)
-            res
-              .status(200)
-              .json({ allData: dataAll, users: filteredData, params: req.params, total: filteredData.length, rows: 10 })
-            // } else {
-            //   res.status(200).json({ status: false, message: 'Token Invalide' })
-            // }
             break
           case 'getUsersAdminWilayah':
             const data = await excuteQuery({
@@ -43,6 +19,30 @@ export default async (req, res) => {
             res.status(200).json({ allData: data, status: true })
             break
           default:
+            // const storedToken = req.headers.authorization
+            // console.log(req.query)
+            // if (storedToken) {
+            const dataAll = await excuteQuery({
+              query: 'select * from users'
+            })
+
+            const { q = '' } = req.query ?? ''
+            const queryLowered = q.toLowerCase()
+            // console.log(queryLowered)
+            const filteredData = dataAll.filter(
+              data =>
+                data.email.toLowerCase().includes(queryLowered) ||
+                data.fullName.toLowerCase().includes(queryLowered) ||
+                data.role.toLowerCase().includes(queryLowered)
+            )
+
+            // console.log(filteredData)
+            res
+              .status(200)
+              .json({ allData: dataAll, data: filteredData, params: req.params, total: filteredData.length, rows: 10 })
+            // } else {
+            //   res.status(200).json({ status: false, message: 'Token Invalide' })
+            // }
             break
         }
 
@@ -51,8 +51,6 @@ export default async (req, res) => {
       case 'POST':
         // console.log()
         if (req.body.data.type == 'edit') {
-
-
           var today = new Date(),
             date =
               today.getFullYear() +

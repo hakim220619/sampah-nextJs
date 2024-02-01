@@ -8,7 +8,6 @@ export const fetchData = createAsyncThunk('appUsers/fetchData', async params => 
   const response = await axios.get('/api/users', {
     params
   })
-  // console.log(params)
   // console.log(response.data)
   return response.data
 })
@@ -42,7 +41,7 @@ export const appUsersSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
-      state.data = action.payload.users
+      state.data = action.payload.data
       state.total = action.payload.total
       state.params = action.payload.params
       state.allData = action.payload.allData
