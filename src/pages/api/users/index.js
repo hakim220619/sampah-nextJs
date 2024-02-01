@@ -51,6 +51,8 @@ export default async (req, res) => {
       case 'POST':
         // console.log()
         if (req.body.data.type == 'edit') {
+
+
           var today = new Date(),
             date =
               today.getFullYear() +
@@ -122,7 +124,7 @@ export default async (req, res) => {
               req.body.village
             ]
           })
-          console.log(response)
+          // console.log(response)
           res.status(201).json({ status: 'Successs Insert Users' })
         }
         break

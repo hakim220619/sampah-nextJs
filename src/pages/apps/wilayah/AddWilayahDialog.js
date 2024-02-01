@@ -68,30 +68,19 @@ const AddDialogWilayah = props => {
   // const [role, setRole] = useState([])
   const dispatch = useDispatch()
   const schema = yup.object().shape({
-    address: yup.string().required(),
-    email: yup.string().email().required(),
-    phone: yup
-      .number()
-      .typeError('Contact Number field is required')
-      .min(10, obj => showErrors('Contact Number', obj.value.length, obj.min))
-      .required(),
-    fullName: yup
+    name: yup
       .string()
       .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
       .required(),
-    password: yup
+    description: yup
       .string()
-      .min(3, obj => showErrors('Password', obj.value.length, obj.min))
+      .min(3, obj => showErrors('First Name', obj.value.length, obj.min))
       .required()
   })
 
   const defaultValues = {
-    email: '',
-    role: '',
-    address: '',
-    fullName: '',
-    password: '',
-    phone: Number('')
+    name: '',
+    description: ''
   }
 
   // const [values, setValues] = useState([])
@@ -127,15 +116,17 @@ const AddDialogWilayah = props => {
   })
 
   const onSubmit = async data => {
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     const dataAll = JSON.stringify({ data, users })
-    // console.log(dataAll)
+    console.log(dataAll)
     const customConfig = {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: storedToken
       }
     }
     await axios
-      .post('/api/users', dataAll, customConfig)
+      .post('/api/wilayah', dataAll, customConfig)
       .then(async response => {
         // console.log(response)
         dispatch(addUser({ ...data, role }))
@@ -213,7 +204,7 @@ const AddDialogWilayah = props => {
                     id='select-users'
                     label='Select Users'
                     labelId='users-select'
-                    onChange={e => setrole(e.target.value)}
+                    onChange={e => setUsers(e.target.value)}
                     inputProps={{ placeholder: 'Select Users' }}
                   >
                     {valuesUsers.map((opts, i) => (

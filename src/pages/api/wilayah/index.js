@@ -31,7 +31,8 @@ export default async (req, res) => {
         break
 
       case 'POST':
-        // console.log()
+        const storedToken = req.headers.authorization
+        console.log(storedToken)
 
         break
 
