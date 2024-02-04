@@ -118,7 +118,7 @@ const AddDialogWilayah = props => {
   const onSubmit = async data => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     const dataAll = JSON.stringify({ data, usersId })
-    console.log(dataAll)
+    // console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json',

@@ -38,7 +38,7 @@ import CardStatisticsHorizontal from 'src/@core/components/card-statistics/card-
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteUser, editUser } from 'src/store/apps/user'
+import { fetchDataWilayah, deleteWilayah, editWilayah } from 'src/store/apps/wilayah'
 
 // ** Third Party Components
 import axios from 'axios'
@@ -96,19 +96,17 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   }
 }))
 
-const RowOptions = ({ id, name }) => {
+const RowOptions = ({ id, userId, name, description, state }) => {
   // ** Hooks
   const dispatch = useDispatch()
-  // console.log(fullName)
-  // ** State
 
   const [anchorEl, setAnchorEl] = useState(null)
   const [EditUserOpen, setEditUserOpen] = useState(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const [show, setShow] = useState(false)
-  //   const [fullNameEd, setFullname] = useState(fullName)
-  //   const [emailEd, setEmail] = useState(email)
-  //   const [roleEd, setRole] = useState(role)
+  const [nameEd, setName] = useState(name)
+  const [userIdEd, setUserId] = useState(userId)
+  const [descriptionEd, setDescription] = useState(description)
   //   const [stateEd, setState] = useState(state)
   //   const [phoneEd, setPhone] = useState(phone)
   //   const [addressEd, setAddress] = useState(address)
@@ -143,22 +141,27 @@ const RowOptions = ({ id, name }) => {
   //     .required()
   // })
   const defaultValues = {
-    nameEd: name
+    nameEd: name,
+    userIdEd: userId,
+    stateEd: state,
+    descriptionEd: description
   }
-  const [values, setValues] = useState([])
+  const [valuesUsers, setValUsers] = useState([])
   // const [role, setrole] = useState()
   //   console.log(role)
-  //   useEffect(() => {
-  //     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-  //     axios
-  //       .get('http://localhost:3000/api/role', {
-  //         headers: {
-  //           Authorization: storedToken
-  //         }
-  //       })
-  //       .then(response => response.data.data)
-  //       .then(val => setValues(val))
-  //   }, [])
+  useEffect(() => {
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    axios
+      .get('/api/users', {
+        params: {
+          params: 'getUsersAdminWilayah'
+        }
+      })
+      .then(response => response.data.allData)
+      .then(val => {
+        setValUsers(val)
+      })
+  }, [])
   // console.log(defaultValues)
   const {
     reset,
@@ -176,7 +179,7 @@ const RowOptions = ({ id, name }) => {
     const dataAll = JSON.stringify({
       data: { id, name }
     })
-    console.log(dataAll)
+    // console.log(dataAll)
     const customConfig = {
       headers: {
         'Content-Type': 'application/json'
@@ -232,7 +235,7 @@ const RowOptions = ({ id, name }) => {
           Delete
         </MenuItem>
       </Menu>
-      {/* <Card>
+      <Card>
         <Dialog
           fullWidth
           open={show}
@@ -266,109 +269,58 @@ const RowOptions = ({ id, name }) => {
               </IconButton>
               <Box sx={{ mb: 8, textAlign: 'center' }}>
                 <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
-                  Edit Users
+                  Edit Wilayah
                 </Typography>
               </Box>
 
               <Grid container spacing={6}>
-                <Grid item sm={6} xs={12}>
+                <Grid item sm={12} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
                     <TextField
-                      value={fullNameEd}
-                      label='Full Name'
-                      onChange={e => setFullname(e.target.value)}
+                      value={nameEd}
+                      label='Name'
+                      onChange={e => setName(e.target.value)}
                       placeholder='John Doe'
-                      error={Boolean(errors.fullName)}
+                      error={Boolean(errors.nameEd)}
                     />
-
-                    {errors.fullName && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.fullName.message}</FormHelperText>
-                    )}
                   </FormControl>
+                  {errors.nameEd && (
+                    <FormHelperText sx={{ color: 'error.main' }}>{errors.nameEd.message}</FormHelperText>
+                  )}
                 </Grid>
-                <Grid item sm={6} xs={12}>
+                <Grid item sm={12} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
-                    <TextField
-                      type='email'
-                      value={emailEd}
-                      label='Email'
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder='johndoe@email.com'
-                      error={Boolean(errors.email)}
-                    />
-
-                    {errors.email && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
-                <Grid item sm={6} xs={12}>
-                  <FormControl fullWidth sx={{ mb: 6 }}>
-                    <InputLabel id='role-select'>Select Role</InputLabel>
+                    <InputLabel id='users-select'>Select Users</InputLabel>
                     <Select
                       fullWidth
-                      value={roleEd}
-                      id='select-role'
-                      label='Select Role'
-                      labelId='role-select'
-                      onChange={e => setRole(e.target.value)}
-                      inputProps={{ placeholder: 'Select Role' }}
+                      value={userIdEd}
+                      id='select-users'
+                      label='Select Users'
+                      labelId='users-select'
+                      onChange={e => setUserId(e.target.value)}
+                      inputProps={{ placeholder: 'Select Users' }}
                     >
-                      {values.map((opts, i) => (
-                        <MenuItem key={i} value={opts.code}>
-                          {opts.roleName}
+                      {valuesUsers.map((opts, i) => (
+                        <MenuItem key={i} value={opts.id}>
+                          {opts.fullName} - {opts.propinsi} - {opts.kabupaten} - {opts.kecamatan} - {opts.desa}
                         </MenuItem>
                       ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item sm={6} xs={12}>
-                  <FormControl fullWidth sx={{ mb: 6 }}>
-                    <InputLabel id='role-select'>Select State</InputLabel>
-                    <Select
-                      fullWidth
-                      value={stateEd}
-                      id='select-state'
-                      label='Select State'
-                      labelId='state-select'
-                      onChange={e => setState(e.target.value)}
-                      inputProps={{ placeholder: 'Select State' }}
-                    >
-                      <MenuItem value='ON'>ON</MenuItem>
-                      <MenuItem value='OFF'>OFF</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item sm={12} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
                     <TextField
-                      type='number'
-                      value={phoneEd}
-                      label='Phone'
-                      onChange={e => setPhone(e.target.value)}
-                      placeholder='(397) 294-5153'
-                      error={Boolean(errors.phone)}
+                      value={descriptionEd}
+                      label='Description'
+                      onChange={e => setDescription(e.target.value)}
+                      placeholder='asd****'
+                      error={Boolean(errors.descriptionEd)}
                     />
-
-                    {errors.contact && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.contact.message}</FormHelperText>
-                    )}
                   </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl fullWidth sx={{ mb: 6 }}>
-                    <TextField
-                      value={addressEd}
-                      label='Address'
-                      onChange={e => setAddress(e.target.value)}
-                      placeholder='Jl hr **'
-                      error={Boolean(errors.address)}
-                    />
-
-                    {errors.company && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.company.message}</FormHelperText>
-                    )}
-                  </FormControl>
+                  {errors.descriptionEd && (
+                    <FormHelperText sx={{ color: 'error.main' }}>{errors.descriptionEd.message}</FormHelperText>
+                  )}
                 </Grid>
                 <Grid item xs={12}>
                   <FormControlLabel
@@ -405,7 +357,7 @@ const RowOptions = ({ id, name }) => {
             </DialogActions>
           </form>
         </Dialog>
-      </Card> */}
+      </Card>
     </>
   )
 }
@@ -514,7 +466,9 @@ const columns = [
     sortable: false,
     field: 'actions',
     headerName: 'Actions',
-    renderCell: ({ row }) => <RowOptions id={row.id} name={row.name} />
+    renderCell: ({ row }) => (
+      <RowOptions id={row.id} userId={row.userId} name={row.name} description={row.description} state={row.state} />
+    )
   }
 ]
 
@@ -525,10 +479,10 @@ const WilayahList = ({ apiData }) => {
   // console.log(apiData)
   const dispatch = useDispatch()
   const store = useSelector(state => state.wilayah)
-  console.log(store)
+  // console.log(store)
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchDataWilayah({
         q: value
       })
     )
@@ -547,7 +501,7 @@ const WilayahList = ({ apiData }) => {
           <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddWilayahDialog} name='Wilayah' />
           <DataGrid
             autoHeight
-            rows={store}
+            rows={store.data}
             columns={columns}
             checkboxSelection
             disableRowSelectionOnClick
