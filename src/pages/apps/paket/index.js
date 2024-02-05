@@ -38,14 +38,14 @@ import CardStatisticsHorizontal from 'src/@core/components/card-statistics/card-
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchDataWilayah, deleteWilayah, editWilayah } from 'src/store/apps/wilayah'
+import { fetchData, deleteUser, editUser } from 'src/store/apps/user'
 
 // ** Third Party Components
 import axios from 'axios'
 
 // ** Custom Table Components Imports
-import TableHeader from 'src/views/apps/user/list/TableHeader'
-import AddWilayahDialog from 'src/pages/apps/wilayah/AddWilayahDialog'
+import TableHeaderPosts from 'src/pages/apps/post/TableHeaderPosts'
+import AddPostsDialog from 'src/pages/apps/post/AddPostsDialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
@@ -79,7 +79,7 @@ const showErrors = (field, valueLen, min) => {
 
 const userStatusObj = {
   ON: 'primary',
-  OFF: 'error'
+  OFF: 'warning'
 }
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -96,18 +96,20 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   }
 }))
 
-const RowOptions = ({ id, userId, name, description, state }) => {
+const RowOptions = ({ id, title }) => {
   // ** Hooks
   const dispatch = useDispatch()
+  // console.log(fullName)
+  // ** State
 
   const [anchorEl, setAnchorEl] = useState(null)
   const [EditUserOpen, setEditUserOpen] = useState(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const [show, setShow] = useState(false)
-  const [nameEd, setName] = useState(name)
-  const [userIdEd, setUserId] = useState(userId)
-  const [descriptionEd, setDescription] = useState(description)
-  const [stateEd, setState] = useState(state)
+  //   const [fullNameEd, setFullname] = useState(fullName)
+  //   const [emailEd, setEmail] = useState(email)
+  //   const [roleEd, setRole] = useState(role)
+  //   const [stateEd, setState] = useState(state)
   //   const [phoneEd, setPhone] = useState(phone)
   //   const [addressEd, setAddress] = useState(address)
 
@@ -120,7 +122,7 @@ const RowOptions = ({ id, userId, name, description, state }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteWilayah(id))
+    dispatch(deleteUser(id))
     handleRowOptionsClose()
   }
   // const schema = yup.object().shape({
@@ -141,27 +143,22 @@ const RowOptions = ({ id, userId, name, description, state }) => {
   //     .required()
   // })
   const defaultValues = {
-    nameEd: name,
-    userIdEd: userId,
-    stateEd: state,
-    descriptionEd: description
+    titleEd: title
   }
-  const [valuesUsers, setValUsers] = useState([])
+  const [values, setValues] = useState([])
   // const [role, setrole] = useState()
   //   console.log(role)
-  useEffect(() => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    axios
-      .get('/api/users', {
-        params: {
-          params: 'getUsersAdminWilayah'
-        }
-      })
-      .then(response => response.data.allData)
-      .then(val => {
-        setValUsers(val)
-      })
-  }, [])
+  //   useEffect(() => {
+  //     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+  //     axios
+  //       .get('http://localhost:3000/api/role', {
+  //         headers: {
+  //           Authorization: storedToken
+  //         }
+  //       })
+  //       .then(response => response.data.data)
+  //       .then(val => setValues(val))
+  //   }, [])
   // console.log(defaultValues)
   const {
     reset,
@@ -177,7 +174,7 @@ const RowOptions = ({ id, userId, name, description, state }) => {
 
   const onSubmit = async () => {
     const dataAll = JSON.stringify({
-      data: { id, userIdEd, nameEd, descriptionEd, stateEd, type: 'edit' }
+      data: { id, title }
     })
     // console.log(dataAll)
     const customConfig = {
@@ -185,16 +182,16 @@ const RowOptions = ({ id, userId, name, description, state }) => {
         'Content-Type': 'application/json'
       }
     }
-    await axios
-      .post('/api/wilayah', dataAll, customConfig)
-      .then(async response => {
-        // console.log(response)
-        dispatch(editWilayah({ ...dataAll }))
-        setShow(false), setAnchorEl(null), reset()
-      })
-      .catch(() => {
-        console.log('gagal')
-      })
+    // await axios
+    //   .post('/api/users', dataAll, customConfig)
+    //   .then(async response => {
+    //     console.log(response)
+    //     dispatch(editUser({ ...dataAll, role }))
+    //     setShow(false), setAnchorEl(null), reset()
+    //   })
+    //   .catch(() => {
+    //     console.log('gagal')
+    //   })
   }
 
   return (
@@ -235,7 +232,7 @@ const RowOptions = ({ id, userId, name, description, state }) => {
           Delete
         </MenuItem>
       </Menu>
-      <Card>
+      {/* <Card>
         <Dialog
           fullWidth
           open={show}
@@ -269,44 +266,61 @@ const RowOptions = ({ id, userId, name, description, state }) => {
               </IconButton>
               <Box sx={{ mb: 8, textAlign: 'center' }}>
                 <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
-                  Edit Wilayah
+                  Edit Users
                 </Typography>
               </Box>
 
               <Grid container spacing={6}>
-                <Grid item sm={12} xs={12}>
+                <Grid item sm={6} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
-                    <InputLabel id='users-select'>Select Users</InputLabel>
-                    <Select
-                      fullWidth
-                      value={userIdEd}
-                      id='select-users'
-                      label='Select Users'
-                      labelId='users-select'
-                      onChange={e => setUserId(e.target.value)}
-                      inputProps={{ placeholder: 'Select Users' }}
-                    >
-                      {valuesUsers.map((opts, i) => (
-                        <MenuItem key={i} value={opts.id}>
-                          {opts.fullName} - {opts.propinsi} - {opts.kabupaten} - {opts.kecamatan} - {opts.desa}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <TextField
+                      value={fullNameEd}
+                      label='Full Name'
+                      onChange={e => setFullname(e.target.value)}
+                      placeholder='John Doe'
+                      error={Boolean(errors.fullName)}
+                    />
+
+                    {errors.fullName && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.fullName.message}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
                     <TextField
-                      value={nameEd}
-                      label='Name'
-                      onChange={e => setName(e.target.value)}
-                      placeholder='John Doe'
-                      error={Boolean(errors.nameEd)}
+                      type='email'
+                      value={emailEd}
+                      label='Email'
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder='johndoe@email.com'
+                      error={Boolean(errors.email)}
                     />
+
+                    {errors.email && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>
+                    )}
                   </FormControl>
-                  {errors.nameEd && (
-                    <FormHelperText sx={{ color: 'error.main' }}>{errors.nameEd.message}</FormHelperText>
-                  )}
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <InputLabel id='role-select'>Select Role</InputLabel>
+                    <Select
+                      fullWidth
+                      value={roleEd}
+                      id='select-role'
+                      label='Select Role'
+                      labelId='role-select'
+                      onChange={e => setRole(e.target.value)}
+                      inputProps={{ placeholder: 'Select Role' }}
+                    >
+                      {values.map((opts, i) => (
+                        <MenuItem key={i} value={opts.code}>
+                          {opts.roleName}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
@@ -328,16 +342,33 @@ const RowOptions = ({ id, userId, name, description, state }) => {
                 <Grid item sm={12} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
                     <TextField
-                      value={descriptionEd}
-                      label='Description'
-                      onChange={e => setDescription(e.target.value)}
-                      placeholder='asd****'
-                      error={Boolean(errors.descriptionEd)}
+                      type='number'
+                      value={phoneEd}
+                      label='Phone'
+                      onChange={e => setPhone(e.target.value)}
+                      placeholder='(397) 294-5153'
+                      error={Boolean(errors.phone)}
                     />
+
+                    {errors.contact && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.contact.message}</FormHelperText>
+                    )}
                   </FormControl>
-                  {errors.descriptionEd && (
-                    <FormHelperText sx={{ color: 'error.main' }}>{errors.descriptionEd.message}</FormHelperText>
-                  )}
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <TextField
+                      value={addressEd}
+                      label='Address'
+                      onChange={e => setAddress(e.target.value)}
+                      placeholder='Jl hr **'
+                      error={Boolean(errors.address)}
+                    />
+
+                    {errors.company && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.company.message}</FormHelperText>
+                    )}
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                   <FormControlLabel
@@ -374,7 +405,7 @@ const RowOptions = ({ id, userId, name, description, state }) => {
             </DialogActions>
           </form>
         </Dialog>
-      </Card>
+      </Card> */}
     </>
   )
 }
@@ -383,60 +414,45 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 250,
-    field: 'fullName',
-    headerName: 'Full Name',
+    field: 'title',
+    headerName: 'Title',
     renderCell: ({ row }) => {
       return (
         <Typography noWrap variant='body2'>
-          {row.fullName}
+          {row.title}
         </Typography>
       )
     }
   },
-  {
-    flex: 0.2,
-    minWidth: 250,
-    field: 'name',
-    headerName: 'Name',
-    renderCell: ({ row }) => {
-      return (
-        <Typography noWrap variant='body2'>
-          {row.name}
-        </Typography>
-      )
-    }
-  },
-
-  {
-    flex: 0.1,
-    minWidth: 110,
-    field: 'state',
-    headerName: 'Status',
-    renderCell: ({ row }) => {
-      return (
-        <CustomChip
-          skin='light'
-          size='small'
-          label={row.state}
-          color={userStatusObj[row.state]}
-          sx={{ textTransform: 'capitalize', '& .MuiChip-label': { lineHeight: '18px' } }}
-        />
-      )
-    }
-  },
-  {
-    flex: 0.15,
-    field: 'description',
-    minWidth: 150,
-    headerName: 'Description',
-    renderCell: ({ row }) => {
-      return (
-        <Typography noWrap variant='body2'>
-          {row.description}
-        </Typography>
-      )
-    }
-  },
+  //   {
+  //     flex: 0.2,
+  //     minWidth: 250,
+  //     field: 'email',
+  //     headerName: 'Email',
+  //     renderCell: ({ row }) => {
+  //       return (
+  //         <Typography noWrap variant='body2'>
+  //           {row.email}
+  //         </Typography>
+  //       )
+  //     }
+  //   },
+  //   {
+  //     flex: 0.15,
+  //     field: 'role',
+  //     minWidth: 150,
+  //     headerName: 'Role',
+  //     renderCell: ({ row }) => {
+  //       return (
+  //         <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 3, color: userRoleObj[row.role].color } }}>
+  //           <Icon icon={userRoleObj[row.role].icon} fontSize={20} />
+  //           <Typography noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+  //             {row.role}
+  //           </Typography>
+  //         </Box>
+  //       )
+  //     }
+  //   },
 
   //   {
   //     flex: 0.1,
@@ -487,23 +503,21 @@ const columns = [
     sortable: false,
     field: 'actions',
     headerName: 'Actions',
-    renderCell: ({ row }) => (
-      <RowOptions id={row.id} userId={row.userId} name={row.name} description={row.description} state={row.state} />
-    )
+    renderCell: ({ row }) => <RowOptions id={row.id} name={row.title} />
   }
 ]
 
-const WilayahList = ({ apiData }) => {
+const PostList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
-  // console.log(apiData)
+  //   console.log(apiData)
   const dispatch = useDispatch()
-  const store = useSelector(state => state.wilayah)
-  // console.log(store)
+  const store = useSelector(state => apiData.posts)
+  //   console.log(store)
   useEffect(() => {
     dispatch(
-      fetchDataWilayah({
+      fetchData({
         q: value
       })
     )
@@ -512,17 +526,17 @@ const WilayahList = ({ apiData }) => {
     setValue(val)
   }, [])
 
-  const toggleAddWilayahDialog = () => setAddUserOpen(!addUserOpen)
+  const toggleAddUserDialog = () => setAddUserOpen(!addUserOpen)
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <Divider />
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddWilayahDialog} name='Wilayah' />
+          <TableHeaderPosts value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} />
           <DataGrid
             autoHeight
-            rows={store.data}
+            rows={store}
             columns={columns}
             checkboxSelection
             disableRowSelectionOnClick
@@ -533,14 +547,15 @@ const WilayahList = ({ apiData }) => {
           />
         </Card>
       </Grid>
-      <AddWilayahDialog show={addUserOpen} toggle={toggleAddWilayahDialog} />
+      <AddPostsDialog show={addUserOpen} toggle={toggleAddUserDialog} />
     </Grid>
   )
 }
 
 export const getStaticProps = async () => {
-  const res = await axios.get('http://localhost:3000/api/wilayah')
+  const res = await axios.get('http://localhost:3000/api/post')
   const apiData = res.data
+  //   console.log(apiData)
   return {
     props: {
       apiData
@@ -548,4 +563,4 @@ export const getStaticProps = async () => {
   }
 }
 
-export default WilayahList
+export default PostList

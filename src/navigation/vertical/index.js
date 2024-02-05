@@ -17,6 +17,10 @@ const navigation = () => {
         {
           title: 'Wilayah',
           path: '/apps/wilayah'
+        },
+        {
+          title: 'Paket',
+          path: '/apps/paket'
         }
       ]
     },

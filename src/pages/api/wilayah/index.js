@@ -33,19 +33,48 @@ export default async (req, res) => {
 
       case 'POST':
         const dateTime = await datetime()
-        const storedToken = req.headers.authorization
-        console.log(dateTime)
-        const response = await excuteQuery({
-          query: 'INSERT INTO wilayah (userId , name , description, state, created_at) VALUES (?, ?, ?, ?, ? ) ',
-          values: [req.body.usersId, req.body.data.name, req.body.data.description, 'ON', dateTime]
-        })
-        console.log(response)
-        res.status(200).json({ status: 'Successs Insert Data' })
+        if (req.body.data.type == 'edit') {
+          console.log(req.body.data)
+          const response = await excuteQuery({
+            query:
+              ' UPDATE  wilayah SET userId = "' +
+              req.body.data.userIdEd +
+              '" , name = "' +
+              req.body.data.nameEd +
+              '" , description = "' +
+              req.body.data.descriptionEd +
+              '", state = "' +
+              req.body.data.stateEd +
+              '", updated_at = "' +
+              dateTime +
+              '" where id = "' +
+              req.body.data.id +
+              '" '
+          })
+          console.log(response)
+          res.status(200).json({ status: 'Successs Update Data' })
+        } else {
+          const storedToken = req.headers.authorization
+
+          const response = await excuteQuery({
+            query: 'INSERT INTO wilayah (userId , name , description, state, created_at) VALUES (?, ?, ?, ?, ? ) ',
+            values: [req.body.usersId, req.body.data.name, req.body.data.description, 'ON', dateTime]
+          })
+          // console.log(response)
+          res.status(200).json({ status: 'Successs Insert Data' })
+        }
 
         break
 
       case 'DELETE':
         console.log(req.body)
+        const result = await excuteQuery({
+          query: 'DELETE FROM wilayah WHERE id = ?',
+          values: [req.body]
+        })
+        //some code...
+        console.log(result)
+        res.status(200).json({ status: 'Successs Deleted Data' })
         break
 
       default:
