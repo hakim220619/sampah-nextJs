@@ -555,7 +555,6 @@ const PostList = ({ apiData }) => {
 export const getStaticProps = async () => {
   const res = await axios.get('http://localhost:3000/api/post')
   const apiData = res.data
-  //   console.log(apiData)
   return {
     props: {
       apiData
