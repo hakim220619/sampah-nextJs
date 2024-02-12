@@ -44,8 +44,8 @@ import { fetchData, deleteUser, editUser } from 'src/store/apps/user'
 import axios from 'axios'
 
 // ** Custom Table Components Imports
-import TableHeaderPosts from 'src/pages/apps/post/TableHeaderPosts'
-import AddPostsDialog from 'src/pages/apps/post/AddPostsDialog'
+import TableHeader from 'src/views/apps/user/list/TableHeader'
+import AddPaketsDialog from 'src/pages/apps/paket/AddPaketDialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import TextField from '@mui/material/TextField'
@@ -509,12 +509,12 @@ const columns = [
 
 const PostList = ({ apiData }) => {
   const [value, setValue] = useState('')
-  const [addUserOpen, setAddUserOpen] = useState(false)
+  const [addPaketOpen, setAddPaketOpen] = useState(false)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
   //   console.log(apiData)
   const dispatch = useDispatch()
-  const store = useSelector(state => apiData.posts)
-  //   console.log(store)
+  const store = useSelector(state => console.log(state))
+  console.log(store)
   useEffect(() => {
     dispatch(
       fetchData({
@@ -526,17 +526,17 @@ const PostList = ({ apiData }) => {
     setValue(val)
   }, [])
 
-  const toggleAddUserDialog = () => setAddUserOpen(!addUserOpen)
+  const toggleAddUserDialog = () => setAddPaketOpen(!addPaketOpen)
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <Divider />
-          <TableHeaderPosts value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} />
+          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDialog} name='Paket' />
           <DataGrid
             autoHeight
-            rows={store}
+            rows={store.data}
             columns={columns}
             checkboxSelection
             disableRowSelectionOnClick
@@ -547,13 +547,13 @@ const PostList = ({ apiData }) => {
           />
         </Card>
       </Grid>
-      <AddPostsDialog show={addUserOpen} toggle={toggleAddUserDialog} />
+      <AddPaketsDialog show={addPaketOpen} toggle={toggleAddUserDialog} />
     </Grid>
   )
 }
 
 export const getStaticProps = async () => {
-  const res = await axios.get('http://localhost:3000/api/post')
+  const res = await axios.get('http://localhost:3000/api/paket')
   const apiData = res.data
   return {
     props: {

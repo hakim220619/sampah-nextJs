@@ -9,6 +9,7 @@ import invoice from 'src/store/apps/invoice'
 import calendar from 'src/store/apps/calendar'
 import permissions from 'src/store/apps/permissions'
 import wilayah from 'src/store/apps/wilayah'
+import paket from 'src/store/apps/paket'
 
 export const store = configureStore({
   reducer: {
@@ -18,7 +19,8 @@ export const store = configureStore({
     invoice,
     calendar,
     permissions,
-    wilayah
+    wilayah,
+    paket
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

@@ -30,6 +30,7 @@ export default async (req, res) => {
       query: 'select * from users where email = ?',
       values: [email]
     })
+    // console.log(result)
     if (result.length > 0) {
       const passwordMatches = await bcrypt.compare(password, result[0]['password'])
       if (passwordMatches) {
@@ -38,7 +39,7 @@ export default async (req, res) => {
           query: 'select * from personal_access_tokens where tokenable_id = ?',
           values: [result[0]['id']]
         })
-        // console.log(cekToken.length)
+        // console.log(accessToken)
         if (cekToken.length < 1) {
           await excuteQuery({
             query:
@@ -58,6 +59,7 @@ export default async (req, res) => {
               result[0]['id'] +
               '"; '
           })
+          // console.log(result[0])
           res.status(200).json({ userData: result[0], accessToken: accessToken })
         }
       } else {
