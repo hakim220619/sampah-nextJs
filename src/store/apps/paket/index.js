@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 // ** Axios Imports
 import axios from 'axios'
 
-// ** Fetch Wilayah
+// ** Fetch Paket
 export const fetchDataPaket = createAsyncThunk('appPaket/fetchData', async params => {
   const response = await axios.get('/api/paket', {
     params
@@ -11,7 +11,7 @@ export const fetchDataPaket = createAsyncThunk('appPaket/fetchData', async param
   return response.data
 })
 
-// ** Add Wilayah
+// ** Add Paket
 export const addPaket = createAsyncThunk('appPaket/addPaket', async (data, { getState, dispatch }) => {
   return dispatch(fetchDataPaket(getState().paket.params))
 })
@@ -19,7 +19,7 @@ export const editPaket = createAsyncThunk('appPaket/addPaket', async (data, { ge
   return dispatch(fetchDataPaket(getState().paket.params))
 })
 
-// ** Delete Wilayah
+// ** Delete Paket
 export const deletePaket = createAsyncThunk('appPaket/deletePaket', async (id, { getState, dispatch }) => {
   const response = await axios.delete('/api/paket', {
     data: id

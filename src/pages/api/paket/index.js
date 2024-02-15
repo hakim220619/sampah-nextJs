@@ -16,15 +16,13 @@ export default async (req, res) => {
 
         const { q = '' } = req.query ?? ''
         const queryLowered = q.toLowerCase()
-        console.log(queryLowered)
+        // console.log(queryLowered)
         const filteredData = data.filter(
           data =>
-            data.namePaket.toLowerCase().includes(queryLowered) ||
-            data.price ||
-            data.description.toLowerCase().includes(queryLowered)
+            data.namePaket.toLowerCase().includes(queryLowered) || data.description.toLowerCase().includes(queryLowered)
         )
 
-        // console.log(filteredData)
+        // console.log(data)
         res
           .status(200)
           .json({ allData: data, data: filteredData, params: req.params, total: filteredData.length, rows: 10 })
@@ -71,7 +69,7 @@ export default async (req, res) => {
       case 'DELETE':
         // console.log(req.body)
         const result = await excuteQuery({
-          query: 'DELETE FROM wilayah WHERE id = ?',
+          query: 'DELETE FROM paket WHERE id = ?',
           values: [req.body]
         })
         //some code...

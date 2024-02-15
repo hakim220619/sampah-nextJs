@@ -59,6 +59,8 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
+import { deletePaket, fetchDataPaket } from 'src/store/apps/paket'
+import { NumericFormat } from 'react-number-format'
 // ** Vars
 const userRoleObj = {
   ADM: { icon: 'mdi:laptop', color: 'error.main' },
@@ -84,6 +86,10 @@ const userStatusObj = {
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
 })
+
+const formatCurrency = value => {
+  return value.toLocaleString('en-US', { style: 'currency', currency: 'IDR' }).replace('IDR', 'Rp. ').replace('.00', '')
+}
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   fontWeight: 600,
@@ -122,7 +128,7 @@ const RowOptions = ({ id, title }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteUser(id))
+    dispatch(deletePaket(id))
     handleRowOptionsClose()
   }
   // const schema = yup.object().shape({
@@ -414,29 +420,42 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 250,
-    field: 'title',
-    headerName: 'Title',
+    field: 'namePaket',
+    headerName: 'Name',
     renderCell: ({ row }) => {
       return (
         <Typography noWrap variant='body2'>
-          {row.title}
+          {row.namePaket}
         </Typography>
       )
     }
   },
-  //   {
-  //     flex: 0.2,
-  //     minWidth: 250,
-  //     field: 'email',
-  //     headerName: 'Email',
-  //     renderCell: ({ row }) => {
-  //       return (
-  //         <Typography noWrap variant='body2'>
-  //           {row.email}
-  //         </Typography>
-  //       )
-  //     }
-  //   },
+  {
+    flex: 0.2,
+    minWidth: 250,
+    field: 'price',
+    headerName: 'Price',
+    renderCell: ({ row }) => {
+      return (
+        <Typography noWrap variant='body2'>
+          {formatCurrency(row.price)}
+        </Typography>
+      )
+    }
+  },
+  {
+    flex: 0.2,
+    minWidth: 250,
+    field: 'description',
+    headerName: 'Description',
+    renderCell: ({ row }) => {
+      return (
+        <Typography noWrap variant='body2'>
+          {row.description}
+        </Typography>
+      )
+    }
+  },
   //   {
   //     flex: 0.15,
   //     field: 'role',
@@ -513,11 +532,11 @@ const PostList = ({ apiData }) => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
   //   console.log(apiData)
   const dispatch = useDispatch()
-  const store = useSelector(state => console.log(state))
-  console.log(store)
+  const store = useSelector(state => state.paket)
+  // console.log(store)
   useEffect(() => {
     dispatch(
-      fetchData({
+      fetchDataPaket({
         q: value
       })
     )
