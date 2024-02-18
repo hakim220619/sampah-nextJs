@@ -60,7 +60,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
 import { deletePaket, fetchDataPaket } from 'src/store/apps/paket'
-import { NumericFormat } from 'react-number-format'
+
 // ** Vars
 const userRoleObj = {
   ADM: { icon: 'mdi:laptop', color: 'error.main' },
@@ -530,6 +530,7 @@ const PostList = ({ apiData }) => {
   const [value, setValue] = useState('')
   const [addPaketOpen, setAddPaketOpen] = useState(false)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
+
   //   console.log(apiData)
   const dispatch = useDispatch()
   const store = useSelector(state => state.paket)

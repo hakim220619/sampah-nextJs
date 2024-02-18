@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, forwardRef, useEffect } from 'react'
+import { useState, forwardRef, useEffect, useRef } from 'react'
 
 // ** Config
 import authConfig from 'src/configs/auth'
@@ -39,6 +39,10 @@ import Icon from 'src/@core/components/icon'
 import Cleave from 'cleave.js/react'
 import 'cleave.js/dist/addons/cleave-phone.id'
 
+import EditorControlled from 'src/views/forms/form-elements/editor/EditorControlled'
+import { EditorWrapper } from 'src/@core/styles/libs/react-draft-wysiwyg'
+import CKeditorDesc from 'src/pages/apps/paket/ckeditor/custom-editor'
+
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
 })
@@ -64,18 +68,18 @@ const AddPaketWilayah = props => {
   // ** States
   const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
   const { show, toggle } = props
-  const [options, setOptions] = useState()
-  // const [role, setRole] = useState([])
+  const [editorLoaded, setEditorLoaded] = useState(true)
+  const [description, setdescription] = useState('')
   const dispatch = useDispatch()
   const schema = yup.object().shape({
     namePaket: yup
       .string()
       .min(3, obj => showErrors('Name Paket', obj.value.length, obj.min))
-      .required(),
-    description: yup
-      .string()
-      .min(3, obj => showErrors('Description', obj.value.length, obj.min))
       .required()
+    // description: yup
+    //   .string()
+    //   .min(3, obj => showErrors('Description', obj.value.length, obj.min))
+    //   .required()
   })
 
   const defaultValues = {
@@ -97,28 +101,38 @@ const AddPaketWilayah = props => {
     resolver: yupResolver(schema)
   })
 
+  const editorRef = useRef()
+  const { CKEditor, ClassicEditor } = editorRef.current || {}
+  useEffect(() => {
+    editorRef.current = {
+      CKEditor: require('@ckeditor/ckeditor5-react').CKEditor,
+      ClassicEditor: require('@ckeditor/ckeditor5-build-classic')
+    }
+  }, [])
+
   const onSubmit = async data => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     // const dataAll = JSON.stringify({ data })
-    console.log(data)
-    const customConfig = {
-      data: data,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: storedToken
-      }
-    }
-    await axios
-      .post('/api/paket', customConfig)
-      .then(async response => {
-        // console.log(response)
-        dispatch(addPaket({ ...data }))
-        reset()
-        toggle()
-      })
-      .catch(() => {
-        console.log('gagal')
-      })
+    console.log(description)
+    // console.log(desct.props)
+    // const customConfig = {
+    //   data: data,
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: storedToken
+    //   }
+    // }
+    // await axios
+    //   .post('/api/paket', customConfig)
+    //   .then(async response => {
+    //     // console.log(response)
+    //     dispatch(addPaket({ ...data }))
+    //     reset()
+    //     toggle()
+    //   })
+    //   .catch(() => {
+    //     console.log('gagal')
+    //   })
   }
 
   const handleclose = event => {
@@ -206,23 +220,26 @@ const AddPaketWilayah = props => {
             <Grid container spacing={6}>
               <Grid item xs={12}>
                 <FormControl fullWidth sx={{ mb: 6 }}>
-                  <Controller
-                    name='description'
-                    control={control}
-                    rules={{ required: false }}
-                    render={({ field: { value, onChange } }) => (
-                      <TextField
-                        value={value}
-                        label='Description'
-                        onChange={onChange}
-                        placeholder='qwerty **'
-                        error={Boolean(errors.description)}
+                  <>
+                    {editorLoaded ? (
+                      <CKEditor
+                        type=''
+                        name='desc'
+                        editor={ClassicEditor}
+                        data={description}
+                        onChange={(event, editor) => {
+                          const data = editor.getData()
+                          setdescription(data)
+                        }}
                       />
+                    ) : (
+                      <div>Editor loading</div>
                     )}
-                  />
-                  {errors.description && (
+                  </>
+
+                  {/* {errors.description && (
                     <FormHelperText sx={{ color: 'error.main' }}>{errors.description.message}</FormHelperText>
-                  )}
+                  )} */}
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
