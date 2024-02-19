@@ -34,7 +34,7 @@ export default async (req, res) => {
       case 'POST':
         const dateTime = await datetime()
         if (req.body.type == 'edit') {
-          //   console.log(req.body.data)
+          console.log(req.body)
           const response = await excuteQuery({
             query:
               ' UPDATE  wilayah SET userId = "' +
@@ -42,7 +42,7 @@ export default async (req, res) => {
               '" , name = "' +
               req.body.data.nameEd +
               '" , description = "' +
-              req.body.data.descriptionEd +
+              req.body.descriptionEd +
               '", state = "' +
               req.body.data.stateEd +
               '", updated_at = "' +
@@ -56,9 +56,11 @@ export default async (req, res) => {
         } else {
           const storedToken = req.body.headers.Authorization
           //   console.log(storedToken)
+          console.log(req.body)
+          console.log(req.body.data)
           const response = await excuteQuery({
             query: 'INSERT INTO paket (namePaket , price , description, state, created_at) VALUES (?, ?, ?, ?, ? ) ',
-            values: [req.body.data.namePaket, req.body.data.price, req.body.data.description, 'ON', dateTime]
+            values: [req.body.data.namePaket, req.body.data.price, req.body.description, 'ON', dateTime]
           })
           // console.log(response)
           res.status(200).json({ status: 'Successs Insert Data' })

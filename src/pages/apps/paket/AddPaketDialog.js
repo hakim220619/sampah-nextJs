@@ -112,27 +112,27 @@ const AddPaketWilayah = props => {
 
   const onSubmit = async data => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    // const dataAll = JSON.stringify({ data })
-    console.log(description)
-    // console.log(desct.props)
-    // const customConfig = {
-    //   data: data,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization: storedToken
-    //   }
-    // }
-    // await axios
-    //   .post('/api/paket', customConfig)
-    //   .then(async response => {
-    //     // console.log(response)
-    //     dispatch(addPaket({ ...data }))
-    //     reset()
-    //     toggle()
-    //   })
-    //   .catch(() => {
-    //     console.log('gagal')
-    //   })
+    const dataAll = JSON.stringify({ data, description })
+
+    const customConfig = {
+      data: data,
+      description: description,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: storedToken
+      }
+    }
+    await axios
+      .post('/api/paket', customConfig)
+      .then(async response => {
+        // console.log(response)
+        dispatch(addPaket({ ...dataAll }))
+        reset()
+        toggle()
+      })
+      .catch(() => {
+        console.log('gagal')
+      })
   }
 
   const handleclose = event => {
