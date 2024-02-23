@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, useCallback, forwardRef } from 'react'
+import { useState, useEffect, useCallback, forwardRef, useRef } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
@@ -59,7 +59,7 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
-import { deletePaket, fetchDataPaket } from 'src/store/apps/paket'
+import { deletePaket, editPaket, fetchDataPaket } from 'src/store/apps/paket'
 
 // ** Vars
 const userRoleObj = {
@@ -81,7 +81,7 @@ const showErrors = (field, valueLen, min) => {
 
 const userStatusObj = {
   ON: 'primary',
-  OFF: 'warning'
+  OFF: 'error'
 }
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -102,7 +102,7 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   }
 }))
 
-const RowOptions = ({ id, title }) => {
+const RowOptions = ({ id, namePaket, price, description, state }) => {
   // ** Hooks
   const dispatch = useDispatch()
   // console.log(fullName)
@@ -112,12 +112,24 @@ const RowOptions = ({ id, title }) => {
   const [EditUserOpen, setEditUserOpen] = useState(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const [show, setShow] = useState(false)
-  //   const [fullNameEd, setFullname] = useState(fullName)
+  const [namePaketEd, setnamePaketEd] = useState(namePaket)
+  const [priceEd, setPrice] = useState(price)
+  const [descriptionEd, setdescriptionEd] = useState(description)
+  const [editorLoaded, setEditorLoaded] = useState(true)
   //   const [emailEd, setEmail] = useState(email)
   //   const [roleEd, setRole] = useState(role)
-  //   const [stateEd, setState] = useState(state)
+  const [stateEd, setState] = useState(state)
   //   const [phoneEd, setPhone] = useState(phone)
   //   const [addressEd, setAddress] = useState(address)
+
+  const editorRef = useRef()
+  const { CKEditor, ClassicEditor } = editorRef.current || {}
+  useEffect(() => {
+    editorRef.current = {
+      CKEditor: require('@ckeditor/ckeditor5-react').CKEditor,
+      ClassicEditor: require('@ckeditor/ckeditor5-build-classic')
+    }
+  }, [])
 
   const handleRowOptionsClick = event => {
     setAnchorEl(event.currentTarget)
@@ -149,23 +161,13 @@ const RowOptions = ({ id, title }) => {
   //     .required()
   // })
   const defaultValues = {
-    titleEd: title
+    namePaketEd: namePaket,
+    priceEd: price,
+    descriptionEd: description,
+    state: state
   }
   const [values, setValues] = useState([])
-  // const [role, setrole] = useState()
-  //   console.log(role)
-  //   useEffect(() => {
-  //     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-  //     axios
-  //       .get('http://localhost:3000/api/role', {
-  //         headers: {
-  //           Authorization: storedToken
-  //         }
-  //       })
-  //       .then(response => response.data.data)
-  //       .then(val => setValues(val))
-  //   }, [])
-  // console.log(defaultValues)
+
   const {
     reset,
     control,
@@ -179,66 +181,37 @@ const RowOptions = ({ id, title }) => {
   })
 
   const onSubmit = async () => {
-    const dataAll = JSON.stringify({
-      data: { id, title }
-    })
     // console.log(dataAll)
     const customConfig = {
+      data: { id, namePaketEd, priceEd, descriptionEd, stateEd },
+      type: 'edit',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
       }
     }
-    // await axios
-    //   .post('/api/users', dataAll, customConfig)
-    //   .then(async response => {
-    //     console.log(response)
-    //     dispatch(editUser({ ...dataAll, role }))
-    //     setShow(false), setAnchorEl(null), reset()
-    //   })
-    //   .catch(() => {
-    //     console.log('gagal')
-    //   })
+    await axios
+      .post('/api/paket', customConfig)
+      .then(async response => {
+        // console.log(response)
+        dispatch(editPaket({ ...dataAll }))
+        setShow(false), setAnchorEl(null), reset()
+      })
+      .catch(() => {
+        console.log('gagal')
+      })
   }
 
   return (
     <>
-      <IconButton size='small' onClick={handleRowOptionsClick}>
-        <Icon icon='mdi:dots-vertical' />
-      </IconButton>
-      <Menu
-        keepMounted
-        anchorEl={anchorEl}
-        open={rowOptionsOpen}
-        onClose={handleRowOptionsClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-        PaperProps={{ style: { minWidth: '8rem' } }}
-      >
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          onClick={handleRowOptionsClose}
-          href='/apps/user/view/overview/'
-        >
-          <Icon icon='mdi:eye-outline' fontSize={20} />
-          View
-        </MenuItem>
-        <MenuItem onClick={() => setShow(true)} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:delete-outline' fontSize={20} />
-          Delete
-        </MenuItem>
-      </Menu>
-      {/* <Card>
+      <MenuItem onClick={() => setShow(true)} sx={{ '& svg': { mr: 2 } }}>
+        <Icon icon='mdi:pencil-outline' fontSize={20} />
+      </MenuItem>
+      <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+        <Icon icon='mdi:delete-outline' fontSize={20} />
+      </MenuItem>
+
+      <Card>
         <Dialog
           fullWidth
           open={show}
@@ -272,7 +245,7 @@ const RowOptions = ({ id, title }) => {
               </IconButton>
               <Box sx={{ mb: 8, textAlign: 'center' }}>
                 <Typography variant='h5' sx={{ mb: 3, lineHeight: '2rem' }}>
-                  Edit Users
+                  Edit Paket
                 </Typography>
               </Box>
 
@@ -280,55 +253,60 @@ const RowOptions = ({ id, title }) => {
                 <Grid item sm={6} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
                     <TextField
-                      value={fullNameEd}
+                      value={namePaketEd}
                       label='Full Name'
-                      onChange={e => setFullname(e.target.value)}
+                      onChange={e => setnamePaketEd(e.target.value)}
                       placeholder='John Doe'
-                      error={Boolean(errors.fullName)}
+                      error={Boolean(errors.namePaketEd)}
                     />
 
-                    {errors.fullName && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.fullName.message}</FormHelperText>
+                    {errors.namePaketEd && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.namePaketEd.message}</FormHelperText>
                     )}
                   </FormControl>
                 </Grid>
+
                 <Grid item sm={6} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
                     <TextField
-                      type='email'
-                      value={emailEd}
-                      label='Email'
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder='johndoe@email.com'
-                      error={Boolean(errors.email)}
+                      value={priceEd}
+                      label='Price'
+                      onChange={e => setPrice(e.target.value)}
+                      placeholder='Rp. ***'
+                      error={Boolean(errors.price)}
                     />
 
-                    {errors.email && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>
+                    {errors.price && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.price.message}</FormHelperText>
                     )}
                   </FormControl>
                 </Grid>
-                <Grid item sm={6} xs={12}>
+
+                <Grid item xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
-                    <InputLabel id='role-select'>Select Role</InputLabel>
-                    <Select
-                      fullWidth
-                      value={roleEd}
-                      id='select-role'
-                      label='Select Role'
-                      labelId='role-select'
-                      onChange={e => setRole(e.target.value)}
-                      inputProps={{ placeholder: 'Select Role' }}
-                    >
-                      {values.map((opts, i) => (
-                        <MenuItem key={i} value={opts.code}>
-                          {opts.roleName}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <>
+                      {editorLoaded ? (
+                        <CKEditor
+                          type=''
+                          name='desc'
+                          editor={ClassicEditor}
+                          data={descriptionEd}
+                          onChange={(event, editor) => {
+                            const data = editor.getData()
+                            setdescriptionEd(data)
+                          }}
+                        />
+                      ) : (
+                        <div>Editor loading</div>
+                      )}
+                    </>
+
+                    {/* {errors.description && (
+                    <FormHelperText sx={{ color: 'error.main' }}>{errors.description.message}</FormHelperText>
+                  )} */}
                   </FormControl>
                 </Grid>
-                <Grid item sm={6} xs={12}>
+                <Grid item sm={12} xs={12}>
                   <FormControl fullWidth sx={{ mb: 6 }}>
                     <InputLabel id='role-select'>Select State</InputLabel>
                     <Select
@@ -345,37 +323,7 @@ const RowOptions = ({ id, title }) => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item sm={12} xs={12}>
-                  <FormControl fullWidth sx={{ mb: 6 }}>
-                    <TextField
-                      type='number'
-                      value={phoneEd}
-                      label='Phone'
-                      onChange={e => setPhone(e.target.value)}
-                      placeholder='(397) 294-5153'
-                      error={Boolean(errors.phone)}
-                    />
 
-                    {errors.contact && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.contact.message}</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl fullWidth sx={{ mb: 6 }}>
-                    <TextField
-                      value={addressEd}
-                      label='Address'
-                      onChange={e => setAddress(e.target.value)}
-                      placeholder='Jl hr **'
-                      error={Boolean(errors.address)}
-                    />
-
-                    {errors.company && (
-                      <FormHelperText sx={{ color: 'error.main' }}>{errors.company.message}</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={<Switch defaultChecked />}
@@ -411,7 +359,7 @@ const RowOptions = ({ id, title }) => {
             </DialogActions>
           </form>
         </Dialog>
-      </Card> */}
+      </Card>
     </>
   )
 }
@@ -440,6 +388,23 @@ const columns = [
         <Typography noWrap variant='body2'>
           {formatCurrency(row.price)}
         </Typography>
+      )
+    }
+  },
+  {
+    flex: 0.1,
+    minWidth: 110,
+    field: 'state',
+    headerName: 'Status',
+    renderCell: ({ row }) => {
+      return (
+        <CustomChip
+          skin='light'
+          size='small'
+          label={row.state}
+          color={userStatusObj[row.state]}
+          sx={{ textTransform: 'capitalize', '& .MuiChip-label': { lineHeight: '18px' } }}
+        />
       )
     }
   },
@@ -522,7 +487,15 @@ const columns = [
     sortable: false,
     field: 'actions',
     headerName: 'Actions',
-    renderCell: ({ row }) => <RowOptions id={row.id} name={row.title} />
+    renderCell: ({ row }) => (
+      <RowOptions
+        id={row.id}
+        namePaket={row.namePaket}
+        price={row.price}
+        description={row.description}
+        state={row.state}
+      />
+    )
   }
 ]
 

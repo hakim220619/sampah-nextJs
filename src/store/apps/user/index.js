@@ -5,9 +5,14 @@ import axios from 'axios'
 
 // ** Fetch Users
 export const fetchData = createAsyncThunk('appUsers/fetchData', async params => {
-  const response = await axios.get('/api/users', {
-    params
-  })
+  const customConfig = {
+    params,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
+    }
+  }
+  const response = await axios.get('/api/users', customConfig)
   // console.log(response.data)
   return response.data
 })
@@ -22,9 +27,14 @@ export const editUser = createAsyncThunk('appUsers/addUser', async (data, { getS
 
 // ** Delete User
 export const deleteUser = createAsyncThunk('appUsers/deleteUser', async (id, { getState, dispatch }) => {
-  const response = await axios.delete('/api/users', {
-    data: id
-  })
+  const customConfig = {
+    data: id,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
+    }
+  }
+  const response = await axios.delete('/api/users', customConfig)
   dispatch(fetchData(getState().user.params))
 
   return response.data

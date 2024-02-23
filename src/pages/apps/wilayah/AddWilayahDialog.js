@@ -39,6 +39,11 @@ import Icon from 'src/@core/components/icon'
 import Cleave from 'cleave.js/react'
 import 'cleave.js/dist/addons/cleave-phone.id'
 
+import ToastPromise from 'src/views/components/toast/ToastPromise'
+
+// ** Third Party Components
+import toast from 'react-hot-toast'
+
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
 })
@@ -91,11 +96,13 @@ const AddDialogWilayah = props => {
 
   //   console.log(role)
   useEffect(() => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    // console.log(customConfig)
     axios
       .get('/api/users', {
         params: {
-          params: 'getUsersAdminWilayah'
+          params: 'getUsersAdminWilayah',
+
+          Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
         }
       })
       .then(response => response.data.allData)
@@ -116,24 +123,26 @@ const AddDialogWilayah = props => {
   })
 
   const onSubmit = async data => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    const dataAll = JSON.stringify({ data, usersId })
     // console.log(dataAll)
     const customConfig = {
+      data: data,
+      usersId: usersId,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: storedToken
+        Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
       }
     }
     await axios
-      .post('/api/wilayah', dataAll, customConfig)
+      .post('/api/wilayah', customConfig)
       .then(async response => {
         // console.log(response)
         dispatch(addWilayah({ ...data, usersId }))
         reset()
         toggle()
+        toast.success('Successfully Added!')
       })
       .catch(() => {
+        toast.error("Failed This didn't work.")
         console.log('gagal')
       })
   }

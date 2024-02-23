@@ -91,7 +91,7 @@ const AddDialogUsers = props => {
     address: '',
     fullName: '',
     password: '',
-    phone: Number('')
+    phone: ''
   }
 
   const [values, setValues] = useState([])
@@ -181,15 +181,23 @@ const AddDialogUsers = props => {
   }
 
   const onSubmit = async data => {
-    const dataAll = JSON.stringify({ data, role, province, regency, district, village })
-    console.log(dataAll)
+    const dataAll = JSON.stringify()
+    // console.log(dataAll)
     const customConfig = {
+      data: data,
+      role: role,
+      province: province,
+      regency: regency,
+      district: district,
+      village: village,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
       }
     }
+    console.log(customConfig)
     await axios
-      .post('/api/users', dataAll, customConfig)
+      .post('/api/users', customConfig)
       .then(async response => {
         // console.log(response)
         dispatch(addUser({ ...data, role, province, regency, district, village }))
@@ -417,7 +425,7 @@ const AddDialogUsers = props => {
                     rules={{ required: false }}
                     render={({ field: { value, onChange } }) => (
                       <TextField
-                        type='number'
+                        type='text'
                         value={value}
                         label='Phone'
                         onChange={onChange}

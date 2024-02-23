@@ -66,7 +66,6 @@ const showErrors = (field, valueLen, min) => {
 
 const AddPaketWilayah = props => {
   // ** States
-  const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
   const { show, toggle } = props
   const [editorLoaded, setEditorLoaded] = useState(true)
   const [description, setdescription] = useState('')
@@ -111,22 +110,22 @@ const AddPaketWilayah = props => {
   }, [])
 
   const onSubmit = async data => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     const dataAll = JSON.stringify({ data, description })
-
     const customConfig = {
       data: data,
       description: description,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: storedToken
+        Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
       }
     }
+    // console.log(customConfig)
     await axios
       .post('/api/paket', customConfig)
       .then(async response => {
         // console.log(response)
         dispatch(addPaket({ ...dataAll }))
+        setdescription('')
         reset()
         toggle()
       })

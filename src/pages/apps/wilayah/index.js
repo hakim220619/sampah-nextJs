@@ -59,6 +59,14 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
+
+import ToastPromise from 'src/views/components/toast/ToastPromise'
+import toast from 'react-hot-toast'
+
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const MySwal = withReactContent(Swal)
 // ** Vars
 const userRoleObj = {
   ADM: { icon: 'mdi:laptop', color: 'error.main' },
@@ -104,6 +112,7 @@ const RowOptions = ({ id, userId, name, description, state }) => {
   const [EditUserOpen, setEditUserOpen] = useState(false)
   const rowOptionsOpen = Boolean(anchorEl)
   const [show, setShow] = useState(false)
+  const [showDelete, setShowDelete] = useState(false)
   const [nameEd, setName] = useState(name)
   const [userIdEd, setUserId] = useState(userId)
   const [descriptionEd, setDescription] = useState(description)
@@ -120,8 +129,16 @@ const RowOptions = ({ id, userId, name, description, state }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteWilayah(id))
-    handleRowOptionsClose()
+    MySwal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Something went wrong!',
+      footer: '<a href="#">Why do I have this issue?</a>'
+    }).then(() => {
+      return MySwal.fire(<p>Shorthand works too</p>)
+    })
+    // dispatch(deleteWilayah(id))
+    // handleRowOptionsClose()
   }
   // const schema = yup.object().shape({
   //   address: yup.string().required(),
@@ -149,16 +166,25 @@ const RowOptions = ({ id, userId, name, description, state }) => {
   const [valuesUsers, setValUsers] = useState([])
   // const [role, setrole] = useState()
   //   console.log(role)
+  // const customConfig = {
+  //   params: 'getUsersAdminWilayah',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
+  //   }
+  // }
   useEffect(() => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     axios
       .get('/api/users', {
         params: {
-          params: 'getUsersAdminWilayah'
+          params: 'getUsersAdminWilayah',
+
+          Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
         }
       })
       .then(response => response.data.allData)
       .then(val => {
+        console.log(val)
         setValUsers(val)
       })
   }, [])
@@ -176,65 +202,35 @@ const RowOptions = ({ id, userId, name, description, state }) => {
   })
 
   const onSubmit = async () => {
-    const dataAll = JSON.stringify({
-      data: { id, userIdEd, nameEd, descriptionEd, stateEd, type: 'edit' }
-    })
-    // console.log(dataAll)
     const customConfig = {
+      data: { id, userIdEd, nameEd, descriptionEd, stateEd, type: 'edit' },
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
       }
     }
     await axios
-      .post('/api/wilayah', dataAll, customConfig)
+      .post('/api/wilayah', customConfig)
       .then(async response => {
-        // console.log(response)
-        dispatch(editWilayah({ ...dataAll }))
+        dispatch(editWilayah({ id, userIdEd, nameEd, descriptionEd, stateEd, type: 'edit' }))
         setShow(false), setAnchorEl(null), reset()
+        toast.success('Successfully Updatedd!')
       })
       .catch(() => {
+        toast.error("Failed This didn't work.")
         console.log('gagal')
       })
   }
 
   return (
     <>
-      <IconButton size='small' onClick={handleRowOptionsClick}>
-        <Icon icon='mdi:dots-vertical' />
-      </IconButton>
-      <Menu
-        keepMounted
-        anchorEl={anchorEl}
-        open={rowOptionsOpen}
-        onClose={handleRowOptionsClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-        PaperProps={{ style: { minWidth: '8rem' } }}
-      >
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          onClick={handleRowOptionsClose}
-          href='/apps/user/view/overview/'
-        >
-          <Icon icon='mdi:eye-outline' fontSize={20} />
-          View
-        </MenuItem>
-        <MenuItem onClick={() => setShow(true)} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:delete-outline' fontSize={20} />
-          Delete
-        </MenuItem>
-      </Menu>
+      <MenuItem onClick={() => setShow(true)} sx={{ '& svg': { mr: 2 } }}>
+        <Icon icon='mdi:pencil-outline' fontSize={20} />
+      </MenuItem>
+      <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+        <Icon icon='mdi:delete-outline' fontSize={20} />
+      </MenuItem>
+
       <Card>
         <Dialog
           fullWidth
@@ -437,50 +433,6 @@ const columns = [
       )
     }
   },
-
-  //   {
-  //     flex: 0.1,
-  //     minWidth: 110,
-  //     field: 'state',
-  //     headerName: 'Status',
-  //     renderCell: ({ row }) => {
-  //       return (
-  //         <CustomChip
-  //           skin='light'
-  //           size='small'
-  //           label={row.state}
-  //           color={userStatusObj[row.state]}
-  //           sx={{ textTransform: 'capitalize', '& .MuiChip-label': { lineHeight: '18px' } }}
-  //         />
-  //       )
-  //     }
-  //   },
-  //   {
-  //     flex: 0.2,
-  //     minWidth: 250,
-  //     field: 'phone',
-  //     headerName: 'Phone',
-  //     renderCell: ({ row }) => {
-  //       return (
-  //         <Typography noWrap variant='body2'>
-  //           {row.phone}
-  //         </Typography>
-  //       )
-  //     }
-  //   },
-  //   {
-  //     flex: 0.2,
-  //     minWidth: 250,
-  //     field: 'address',
-  //     headerName: 'Address',
-  //     renderCell: ({ row }) => {
-  //       return (
-  //         <Typography noWrap variant='body2'>
-  //           {row.address}
-  //         </Typography>
-  //       )
-  //     }
-  //   },
   {
     flex: 0.1,
     minWidth: 90,
@@ -536,16 +488,6 @@ const WilayahList = ({ apiData }) => {
       <AddWilayahDialog show={addUserOpen} toggle={toggleAddWilayahDialog} />
     </Grid>
   )
-}
-
-export const getStaticProps = async () => {
-  const res = await axios.get('http://localhost:3000/api/wilayah')
-  const apiData = res.data
-  return {
-    props: {
-      apiData
-    }
-  }
 }
 
 export default WilayahList

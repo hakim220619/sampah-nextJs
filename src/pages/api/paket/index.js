@@ -32,38 +32,45 @@ export default async (req, res) => {
         break
 
       case 'POST':
+        // console.log(req.body)
         const dateTime = await datetime()
         if (req.body.type == 'edit') {
-          console.log(req.body)
-          const response = await excuteQuery({
-            query:
-              ' UPDATE  wilayah SET userId = "' +
-              req.body.data.userIdEd +
-              '" , name = "' +
-              req.body.data.nameEd +
-              '" , description = "' +
-              req.body.descriptionEd +
-              '", state = "' +
-              req.body.data.stateEd +
-              '", updated_at = "' +
-              dateTime +
-              '" where id = "' +
-              req.body.data.id +
-              '" '
-          })
-          console.log(response)
-          res.status(200).json({ status: 'Successs Update Data' })
+          // console.log(req.body.headers.Authorization)
+          if (req.body.headers.Authorization == process.env.NEXT_PUBLIC_JWT_SECRET) {
+            const response = await excuteQuery({
+              query:
+                ' UPDATE  paket SET namePaket = "' +
+                req.body.data.namePaketEd +
+                '" , price = "' +
+                req.body.data.priceEd +
+                '" , description = "' +
+                req.body.data.descriptionEd +
+                '", state = "' +
+                req.body.data.stateEd +
+                '", updated_at = "' +
+                dateTime +
+                '" where id = "' +
+                req.body.data.id +
+                '" '
+            })
+            // console.log(response)
+            res.status(200).json({ status: 'Successs Update Data' })
+          } else {
+            res.status(500).json({ status: 'Token Failed' })
+          }
         } else {
           const storedToken = req.body.headers.Authorization
-          //   console.log(storedToken)
-          console.log(req.body)
-          console.log(req.body.data)
-          const response = await excuteQuery({
-            query: 'INSERT INTO paket (namePaket , price , description, state, created_at) VALUES (?, ?, ?, ?, ? ) ',
-            values: [req.body.data.namePaket, req.body.data.price, req.body.description, 'ON', dateTime]
-          })
-          // console.log(response)
-          res.status(200).json({ status: 'Successs Insert Data' })
+
+          if (storedToken == process.env.NEXT_PUBLIC_JWT_SECRET) {
+            const response = await excuteQuery({
+              query: 'INSERT INTO paket (namePaket , price , description, state, created_at) VALUES (?, ?, ?, ?, ? ) ',
+              values: [req.body.data.namePaket, req.body.data.price, req.body.description, 'ON', dateTime]
+            })
+            // console.log(response)
+            res.status(200).json({ status: 'Successs Insert Data' })
+          } else {
+            res.status(500).json({ status: 'Token Failed' })
+          }
         }
 
         break

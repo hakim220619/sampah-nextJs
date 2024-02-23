@@ -178,20 +178,19 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
   })
 
   const onSubmit = async () => {
-    const dataAll = JSON.stringify({
-      data: { id, fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd, type: 'edit' }
-    })
-    // console.log(dataAll)
     const customConfig = {
+      data: { id, fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd },
+      type: 'edit',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
       }
     }
     await axios
-      .post('/api/users', dataAll, customConfig)
+      .post('/api/users', customConfig)
       .then(async response => {
         // console.log(response)
-        dispatch(editUser({ ...dataAll, role }))
+        dispatch(editUser({ id, fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd, role }))
         setShow(false), setAnchorEl(null), reset()
       })
       .catch(() => {
@@ -201,42 +200,13 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
 
   return (
     <>
-      <IconButton size='small' onClick={handleRowOptionsClick}>
-        <Icon icon='mdi:dots-vertical' />
-      </IconButton>
-      <Menu
-        keepMounted
-        anchorEl={anchorEl}
-        open={rowOptionsOpen}
-        onClose={handleRowOptionsClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right'
-        }}
-        PaperProps={{ style: { minWidth: '8rem' } }}
-      >
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          onClick={handleRowOptionsClose}
-          href='/apps/user/view/overview/'
-        >
-          <Icon icon='mdi:eye-outline' fontSize={20} />
-          View
-        </MenuItem>
-        <MenuItem onClick={() => setShow(true)} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:delete-outline' fontSize={20} />
-          Delete
-        </MenuItem>
-      </Menu>
+      <MenuItem onClick={() => setShow(true)} sx={{ '& svg': { mr: 2 } }}>
+        <Icon icon='mdi:pencil-outline' fontSize={20} />
+      </MenuItem>
+      <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+        <Icon icon='mdi:delete-outline' fontSize={20} />
+      </MenuItem>
+
       <Card>
         <Dialog
           fullWidth
@@ -566,16 +536,6 @@ const UserList = ({ apiData }) => {
       <AddUserDialog show={addUserOpen} toggle={toggleAddUserDialog} />
     </Grid>
   )
-}
-
-export const getStaticProps = async () => {
-  const res = await axios.get('http://localhost:3000/api/users')
-  const apiData = res.data
-  return {
-    props: {
-      apiData
-    }
-  }
 }
 
 export default UserList

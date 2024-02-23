@@ -5,9 +5,15 @@ import axios from 'axios'
 
 // ** Fetch Wilayah
 export const fetchDataWilayah = createAsyncThunk('appWilayah/fetchData', async params => {
-  const response = await axios.get('/api/wilayah', {
-    params
-  })
+  const customConfig = {
+    params,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
+    }
+  }
+  // console.log(customConfig)
+  const response = await axios.get('/api/wilayah', customConfig)
   return response.data
 })
 
@@ -21,9 +27,14 @@ export const editWilayah = createAsyncThunk('appWilayah/addWilayah', async (data
 
 // ** Delete Wilayah
 export const deleteWilayah = createAsyncThunk('appWilayah/deleteWilayah', async (id, { getState, dispatch }) => {
-  const response = await axios.delete('/api/wilayah', {
-    data: id
-  })
+  const customConfig = {
+    data: id,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
+    }
+  }
+  const response = await axios.delete('/api/wilayah', customConfig)
   dispatch(fetchDataWilayah(getState().wilayah.params))
 
   return response.data
