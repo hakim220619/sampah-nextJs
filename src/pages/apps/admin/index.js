@@ -474,7 +474,7 @@ const columns = [
   },
   {
     flex: 0.1,
-    minWidth: 90,
+    minWidth: 150,
     sortable: false,
     field: 'actions',
     headerName: 'Actions',

@@ -43,6 +43,8 @@ import EditorControlled from 'src/views/forms/form-elements/editor/EditorControl
 import { EditorWrapper } from 'src/@core/styles/libs/react-draft-wysiwyg'
 import CKeditorDesc from 'src/pages/apps/paket/ckeditor/custom-editor'
 
+import toast from 'react-hot-toast'
+
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
 })
@@ -128,8 +130,10 @@ const AddPaketWilayah = props => {
         setdescription('')
         reset()
         toggle()
+        toast.success('Successfully Added!')
       })
       .catch(() => {
+        toast.error("Failed This didn't work.")
         console.log('gagal')
       })
   }

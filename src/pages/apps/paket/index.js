@@ -61,6 +61,12 @@ import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
 import { deletePaket, editPaket, fetchDataPaket } from 'src/store/apps/paket'
 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import toast from 'react-hot-toast'
+
+const MySwal = withReactContent(Swal)
+
 // ** Vars
 const userRoleObj = {
   ADM: { icon: 'mdi:laptop', color: 'error.main' },
@@ -140,8 +146,21 @@ const RowOptions = ({ id, namePaket, price, description, state }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deletePaket(id))
-    handleRowOptionsClose()
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(result => {
+      if (result.isConfirmed) {
+        dispatch(deletePaket(id))
+        handleRowOptionsClose()
+        toast.success('Successfully has been deleted.')
+      }
+    })
   }
   // const schema = yup.object().shape({
   //   address: yup.string().required(),
@@ -194,10 +213,12 @@ const RowOptions = ({ id, namePaket, price, description, state }) => {
       .post('/api/paket', customConfig)
       .then(async response => {
         // console.log(response)
-        dispatch(editPaket({ ...dataAll }))
+        dispatch(editPaket({ id, namePaketEd, priceEd, descriptionEd, stateEd }))
         setShow(false), setAnchorEl(null), reset()
+        toast.success('Successfully Updatedd!')
       })
       .catch(() => {
+        toast.error("Failed This didn't work.")
         console.log('gagal')
       })
   }

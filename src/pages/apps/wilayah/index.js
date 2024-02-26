@@ -130,15 +130,20 @@ const RowOptions = ({ id, userId, name, description, state }) => {
 
   const handleDelete = () => {
     MySwal.fire({
-      icon: 'error',
-      title: 'Oops...',
-      text: 'Something went wrong!',
-      footer: '<a href="#">Why do I have this issue?</a>'
-    }).then(() => {
-      return MySwal.fire(<p>Shorthand works too</p>)
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(result => {
+      if (result.isConfirmed) {
+        dispatch(deleteWilayah(id))
+        handleRowOptionsClose()
+        toast.success('Successfully has been deleted.')
+      }
     })
-    // dispatch(deleteWilayah(id))
-    // handleRowOptionsClose()
   }
   // const schema = yup.object().shape({
   //   address: yup.string().required(),
@@ -184,7 +189,6 @@ const RowOptions = ({ id, userId, name, description, state }) => {
       })
       .then(response => response.data.allData)
       .then(val => {
-        console.log(val)
         setValUsers(val)
       })
   }, [])
