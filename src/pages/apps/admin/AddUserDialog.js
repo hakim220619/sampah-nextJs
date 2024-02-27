@@ -38,6 +38,7 @@ import Icon from 'src/@core/components/icon'
 // ** CleaveJS Imports
 import Cleave from 'cleave.js/react'
 import 'cleave.js/dist/addons/cleave-phone.id'
+import toast from 'react-hot-toast'
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Fade ref={ref} {...props} />
@@ -203,8 +204,10 @@ const AddDialogUsers = props => {
         dispatch(addUser({ ...data, role, province, regency, district, village }))
         reset()
         toggle()
+        toast.success('Successfully Added!')
       })
       .catch(() => {
+        toast.error("Failed This didn't work.")
         console.log('gagal')
       })
   }

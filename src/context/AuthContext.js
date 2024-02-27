@@ -48,6 +48,7 @@ const AuthProvider = ({ children }) => {
             }
           })
           .then(async response => {
+            // console.log(response);
             setLoading(false)
             setUser({ ...response.data.userData })
           })

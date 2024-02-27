@@ -59,11 +59,16 @@ import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import FormHelperText from '@mui/material/FormHelperText'
+import toast from 'react-hot-toast'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const MySwal = withReactContent(Swal)
 // ** Vars
 const userRoleObj = {
-  ADM: { icon: 'mdi:laptop', color: 'error.main' },
-  ADW: { icon: 'mdi:cog-outline', color: 'warning.main' },
-  PLG: { icon: 'mdi:pencil-outline', color: 'info.main' }
+  ADM: { icon: 'mdi-human-handsdown', color: 'error.main' },
+  ADW: { icon: 'mdi-human-child', color: 'warning.main' },
+  PLG: { icon: 'mdi-human-greeting', color: 'info.main' }
   // maintainer: { icon: 'mdi:chart-donut', color: 'success.main' },
   // subscriber: { icon: 'mdi:account-outline', color: 'primary.main' }
 }
@@ -122,8 +127,21 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteUser(id))
-    handleRowOptionsClose()
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(result => {
+      if (result.isConfirmed) {
+        dispatch(deleteUser(id))
+        handleRowOptionsClose()
+        toast.success('Successfully has been deleted.')
+      }
+    })
   }
   // const schema = yup.object().shape({
   //   address: yup.string().required(),
@@ -192,8 +210,10 @@ const RowOptions = ({ id, fullName, email, role, state, phone, address }) => {
         // console.log(response)
         dispatch(editUser({ id, fullNameEd, emailEd, roleEd, stateEd, phoneEd, addressEd, role }))
         setShow(false), setAnchorEl(null), reset()
+        toast.success('Successfully Updatedd!')
       })
       .catch(() => {
+        toast.error("Failed This didn't work.")
         console.log('gagal')
       })
   }
