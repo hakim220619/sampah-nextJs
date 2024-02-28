@@ -9,6 +9,7 @@ import axios from 'axios'
 
 // ** Config
 import authConfig from 'src/configs/auth'
+import url from 'src/configs/url'
 
 // ** Defaults
 const defaultProvider = {
@@ -30,25 +31,22 @@ const AuthProvider = ({ children }) => {
   const router = useRouter()
   useEffect(() => {
     const initAuth = async () => {
-      const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+      const storedToken = window.localStorage.getItem('token')
       const userData = window.localStorage.getItem('userData')
       const refreshToken = window.localStorage.getItem('refreshToken')
-      // console.log(storedToken)
-      // console.log(userData)
+      console.log(userData)
+      console.log(storedToken)
       // console.log(refreshToken)
       // localStorage.removeItem('userData')
       // localStorage.removeItem('refreshToken')
       // localStorage.removeItem('accessToken')
       if (storedToken) {
         setLoading(true)
+        const public_url = await url()
         await axios
-          .get(authConfig.meEndpoint, {
-            headers: {
-              Authorization: storedToken
-            }
-          })
+          .post(public_url + '/checkLogin', { token: storedToken })
           .then(async response => {
-            // console.log(response);
+            // console.log(response)
             setLoading(false)
             setUser({ ...response.data.userData })
           })
@@ -73,16 +71,17 @@ const AuthProvider = ({ children }) => {
     initAuth()
   }, [])
 
-  const handleLogin = (params, errorCallback) => {
+  const handleLogin = async (params, errorCallback) => {
+    const public_url = await url()
+    // console.log(public_url)
     axios
-      .post('/api/login', params)
+      .post(public_url + '/login', params)
       .then(async response => {
-        params.rememberMe
-          ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
-          : null
+        console.log(response)
+        params.rememberMe ? window.localStorage.setItem('token', response.data.token) : null
         const returnUrl = router.query.returnUrl
-        setUser({ ...response.data.userData })
-        params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.userData)) : null
+        setUser({ ...response.data.data })
+        params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.data)) : null
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
         router.replace(redirectURL)
       })
