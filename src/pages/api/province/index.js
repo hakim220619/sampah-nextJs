@@ -4,7 +4,7 @@ export default async (req, res) => {
   try {
     // console.log(storedToken)
     // if (storedToken) {
-    console.log(res)
+    // console.log(res)
     const result = await excuteQuery({
       query: 'select * from propinsi'
     })

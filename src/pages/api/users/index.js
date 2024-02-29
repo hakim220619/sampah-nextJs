@@ -79,7 +79,7 @@ export default async (req, res) => {
                 req.body.data.id +
                 '" '
             })
-            console.log(response)
+            // console.log(response)
             res.status(201).json({ status: 'Successs Update Users' })
           } else {
             res.status(500).json({ status: 'Token Failed' })
@@ -88,7 +88,7 @@ export default async (req, res) => {
           const storedToken = req.body.headers.Authorization
           if (storedToken == process.env.NEXT_PUBLIC_JWT_SECRET) {
             const dateTime = await datetime()
-            console.log(req.body.data.data)
+            // console.log(req.body.data.data)
             const hashedPassword = await bcrypt.hash(req.body.data.password, 10)
             const response = await excuteQuery({
               query:
@@ -124,7 +124,7 @@ export default async (req, res) => {
             values: [req.body]
           })
           //some code...
-          console.log(result)
+          // console.log(result)
           res.status(200).json({ status: 'Successs Deleted Users' })
         } else {
           res.status(500).json({ status: 'Token Failed' })

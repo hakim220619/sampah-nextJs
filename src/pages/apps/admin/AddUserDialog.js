@@ -196,7 +196,7 @@ const AddDialogUsers = props => {
         Authorization: process.env.NEXT_PUBLIC_JWT_SECRET
       }
     }
-    console.log(customConfig)
+    // console.log(customConfig)
     await axios
       .post('/api/users', customConfig)
       .then(async response => {
